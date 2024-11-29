@@ -69,8 +69,16 @@ const IntersectionPage = () => {
                         </div>
                     ))) : (<p>No reports found for this intersection.</p>)}
                 </div>
-                
             </div>
+            <div className="intersection-info-2">
+                <div className='intersection-reports'>
+                    <h1>Reports Recieved</h1>
+                </div>
+                <div className='intersection-logs'>
+                    <h1>Camera Logs</h1>
+                </div>
+            </div>
+            
             
             
         </div>
