@@ -1,21 +1,352 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Oswald:wght@200..700&family=Outfit:wght@100..900&display=swap');
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ebebeb;
+  margin: 0;
 }
+
+.shadow{
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06); 
+}
+/* 
+Maybe a homescreen to enter
+
+.interfact-home-logo{
+  font-family: 'outfit';
+  color: white;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: 4em;
+  flex-direction: column;
+  width: 500px;
+  margin: 0 auto;
+  font-weight: 700;
+  background-color: #0B0D0E;
+  border-radius: 20px;
+  padding: 150px;
+  margin-top: 150px;
+}
+
+.interfact-home-logo2{
+  font-size: .5em;
+} */
+
+
+.logo img{
+  width: 35px;
+  height: 35px;
+}
+
+.logo{
+  font-family: 'outfit';
+  font-weight: 700;
+  width: 230px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8em;
+  gap: 15px;
+  border-radius: 8px;
+  color: #1d2022;
+  padding: 8px;
+}
+
+.logo-words{
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.logo3{
+  font-size: .4em;
+}
+
+
+.nav-container{
+  display: flex;
+  gap: 30px;
+  margin: 30px;
+  margin-left: 70px;
+  margin-right: 70px;
+  align-items: center;
+  background-color: white;
+  border-radius: 20px;
+  padding: 10px;
+}
+
+/* .nav-account {
+  
+} */
+
+.nav-home{
+  margin-left: 50px;
+}
+
+.nav-home, .nav-locations , .nav-requests , .nav-account, .nav-dashboard{
+  font-family: 'outfit';
+  text-decoration: none;
+  font-size: 1.2em;
+  color: #1d2022;
+  font-weight: 400;
+  padding: 10px;
+  border-radius: 13px;
+
+}
+
+.top-dashboard{
+  background-color: white;
+  display: flex;
+  justify-content: center; 
+  margin: 30px;
+  margin-left: 70px;
+  margin-right: 70px;
+  height: 42vh;
+  border-radius: 20px;
+  color: white;
+  position: relative;
+}
+
+.dash-main{
+  font-family: 'outfit';
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center; 
+  gap: 10px;
+  color: #1d2022;
+  font-weight: 700;
+}
+
+.dash-main-1{
+  font-size: 5em;
+  /* text-decoration: underline; */
+}
+
+.dash-main hr{
+  width: 300px;
+  height: 6px;
+  background-color: #1d2022;
+}
+
+.dash-main-2{
+  margin-top: 30px;
+  color: #535353;
+  font-size: 1.2em;
+}
+
+.dash-main-3{
+  font-size: 1.2em;
+  color: #535353;
+}
+
+.filter{
+  font-family: 'outfit';
+  display: flex;
+  align-items: center;
+  margin-left: 70px;
+}
+
+.filter-1{
+  background-color: aqua;
+  padding: 12px;
+  border: none;
+  color: white;
+  background-color: #1d2022;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .08s;
+}
+.filter-1:hover{
+  color: #1d2022;
+  background-color: white;
+}
+
+.filter-2{
+  margin-left: 5px;
+  padding: 4px;
+  
+}
+
+.intersection-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 1rem;
+  padding: 1rem;
+  justify-items: center;
+  align-items: start;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.intersection-item {
+  display: flex;
+  flex-direction: column;
+  height: 350px;
+  width: 300px;
+  border-radius: 15px;
+  transition: all .1s;
+  margin-bottom: 15px;
+  background-color: #1d2022;
+}
+.intersection-item:hover {
+  scale: 1.05;
+  cursor: pointer;
+}
+
+
+.item-img-container {
+  position: relative;
+  flex: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.item-img-container img {
+  border-radius: 15px 15px 0 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.item-info-container {
+  flex: 2;
+  padding: 0.5rem; 
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-family: 'outfit';
+  font-weight: 600;
+  align-items: center;
+  gap: 10px;
+}
+.item-info-container span{
+  font-weight: 800;
+  color: #9c9c9c;
+}
+
+.item-reports {
+  position: absolute; 
+  top: 5px; 
+  right: 5px;
+  background-color: #fa4242; 
+  padding: 2px 8px; 
+  border-radius: 50px; 
+  font-weight: bold;
+  font-family: 'outfit';
+  color: #1d2022;
+}
+
+/* use for toggle between working/notworking */
+.good-indicator{
+  margin: 0 auto;
+  background-color: #42fa42;
+  width: 50%;
+  height: 7px;
+  border-radius: 15px;
+
+}
+.bad-indicator{
+  margin: 0 auto;
+  background-color: #fa4242;
+  width: 50%;
+  height: 7px;
+  border-radius: 15px;
+}
+
+.item-name{
+  position: absolute; 
+  top: 5px; 
+  left: 5px;
+  background-color: white; 
+  padding: 2px 8px; 
+  border-radius: 50px; 
+  font-weight: bold;
+  font-family: 'outfit';
+  color: #1d2022;
+}
+
+.intersection-add {
+  display: flex;
+  flex-direction: column;
+  height: 350px;
+  width: 300px;
+  border-radius: 15px;
+  transition: all .1s;
+  margin-bottom: 15px;
+
+  justify-content: center;
+  align-items: center;
+}
+.intersection-add:hover {
+  scale: 1.05;
+}
+.fa-plus{
+  color: white;  
+  transition: all .2s;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: #1d2022;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+}
+.fa-plus:hover{
+  cursor: pointer;
+  width: 95%;
+  height: 95%;
+}
+.fa-plus svg {
+  pointer-events: none;
+}
+
+.map-view{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 12px;
+  margin: 8px;
+  border-radius: 30px;
+  border: none;
+  background-color: #1d2022;
+  color: white;
+  font-family: 'outfit';
+  font-size: 1em;
+  transition: all .1s;
+}
+.map-view:hover{
+  scale: 1.03;
+  cursor: pointer;
+  background-color: white;
+  color: #1d2022;
+  border: 1px solid #1d2022;
+}
+
+.refresh-button{
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 15px 18px;
+  margin: 8px;
+  border-radius: 30px;
+  border: none;
+  background-color: #1d2022;
+  color: white;
+  font-family: 'outfit';
+  font-size: 1em;
+  transition: all .08s;
+}
+.refresh-button:hover{
+  scale: 1.04;
+  cursor: pointer;
+  background-color: white;
+  color: #1d2022;
+  border: 1px solid #1d2022
+}
+
