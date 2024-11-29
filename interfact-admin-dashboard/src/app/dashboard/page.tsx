@@ -7,13 +7,13 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
 
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
-
-    
+    const router = useRouter();
 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
@@ -34,6 +34,13 @@ export default function Home() {
             return total;
         }, 0);
     };
+
+    const navToIntersectionPage = (id: string) =>{
+        router.push(`/Intersection/${id}`)
+    }
+
+    // <Link href={`/Intersection/${item.id}`}>GO</Link>
+
 
     //Used for debuging incoming data
     // const displayIntersections = () =>{
@@ -102,7 +109,7 @@ export default function Home() {
                 <div className="intersection-list">
                 
                     {intersections.map((item) => (
-                        <div key={item.id} className="intersection-item shadow">
+                        <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
                             <div className="item-img-container">
                                 <img src={item.imagepath} alt={item.name} />
                                 <div className="item-reports">{getReportsForIntersection(item.id)}</div>
@@ -111,7 +118,7 @@ export default function Home() {
                             <div className="item-info-container">
                                 <div className="item-last-update"><span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago</div>
                                 <div className="item-status"><span>Image Classification | </span> {item.status}</div>
-                                <div className='item-down'><span>Camera Status | </span> WORKING</div>  
+                                <div className='item-down'><span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working": "Not Working"}</div>  
                             </div>
                             <div className={calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator": "bad-indicator"}></div>
                         </div>
