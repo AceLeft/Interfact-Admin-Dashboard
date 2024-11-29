@@ -17,11 +17,9 @@ export default function Home() {
 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
-      }, 0);
-
-    const getTotalIntersections = userFeedback.reduce((total, Intersections) => {
-    return total + (intersections ? intersections.length : 0);
     }, 0);
+
+    const totalIntersections = intersections.length;
 
     const getReportsForIntersection = (intersectionId: string) => {
         return userFeedback.reduce((total, user) => {
@@ -38,8 +36,6 @@ export default function Home() {
     const navToIntersectionPage = (id: string) =>{
         router.push(`/Intersection/${id}`)
     }
-
-    // <Link href={`/Intersection/${item.id}`}>GO</Link>
 
 
     //Used for debuging incoming data
@@ -95,7 +91,7 @@ export default function Home() {
                 <div className="dash-main">
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
-                    <div className="dash-main-2">• Total Intersections: {getTotalIntersections}</div>
+                    <div className="dash-main-2">• Total Intersections: {totalIntersections}</div>
                     <div className="dash-main-3">• Problems Reported (Last 30 days): {getTotalReports}</div>
                 </div>
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
@@ -103,7 +99,7 @@ export default function Home() {
             </div>
             <div className="filter">
                     <button className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
-                    <div className='filter-2'>showing {getTotalIntersections} intersections</div>
+                    <div className='filter-2'>showing {totalIntersections} intersections</div>
             </div>
             <div className="intersection-list">
                 <div className="intersection-list">
