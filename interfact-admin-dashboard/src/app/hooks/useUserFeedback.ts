@@ -8,8 +8,9 @@ export interface Report {
   }
 
 export interface UserFeedback {
-    reports: Report[],
-    requests: string[]
+    id: string;
+    reports: Report[];
+    requests: string[];
 }
 
 
@@ -23,8 +24,8 @@ export const useUserFeedback = () => {
 
                 return {
                     id: doc.id,
-                    reports: docData.reports,
-                    requests: docData.requests 
+                    reports: Array.isArray(docData.reports) ? docData.reports : [],
+                    requests: Array.isArray(docData.requests) ? docData.requests : []
                 } as UserFeedback;
             });
 
