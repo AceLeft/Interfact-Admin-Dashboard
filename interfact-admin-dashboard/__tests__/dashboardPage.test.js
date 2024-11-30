@@ -5,11 +5,11 @@ import React from 'react'
 
  
 describe('Home', () => {
-  it('renders a heading', () => {
+  it('renders a filter for intersections', () => {
     render(<Home />)
  
-    const heading = screen.getByRole('heading', { level: 1 })
+    const intersectionList = screen.getByRole('Filter')
  
-    expect(heading).toBeInTheDocument()
+    expect(intersectionList).toBeInTheDocument()
   })
 })
