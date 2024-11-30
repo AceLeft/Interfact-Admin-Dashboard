@@ -8,12 +8,21 @@ import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Home() {
 
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
     const router = useRouter();
+
+    const [isFiltering, setIsFiltering] = useState<boolean | null>(null);
+
+    const [ isFilterOpen, setIsFilterOpen] = useState<boolean | null>(null);
+    const [ isFilterBlocked, setIsFilterBlocked] = useState<boolean | null>(null);
+    const [ isFilterWorking, setIsFilterWorking] = useState<boolean | null>(null);
+    const [ isFilterNotWorking, setIsFilterNotWorking] = useState<boolean | null>(null);
+
 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
@@ -37,14 +46,13 @@ export default function Home() {
         router.push(`/Intersection/${id}`)
     }
 
+    const filterIntersections = () =>{
+        setIsFiltering(!isFiltering) 
+    } 
 
-    //Used for debuging incoming data
-    // const displayIntersections = () =>{
-    //     console.log(intersections)
-    // }
-    // const displayUserFeedback = () =>{
-    //     console.log(userFeedback)
-    // }
+    const filterOptions = () => {
+        //TODO
+    }
 
     const interfactLiveRedirect = () => {
         window.open('https://interfact.live/map', '_blank');
@@ -91,15 +99,26 @@ export default function Home() {
                 <div className="dash-main">
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
-                    <div className="dash-main-2">• Total Intersections: {totalIntersections}</div>
-                    <div className="dash-main-3">• Problems Reported (Last 30 days): {getTotalReports}</div>
+                    <div className="dash-main-2">Total Intersections | <span>{totalIntersections}</span></div>
+                    <div className="dash-main-3">Problems Reported (Last 30 days) | <span>{getTotalReports}</span></div>
                 </div>
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
                 <button className='refresh-button'><FontAwesomeIcon icon={faArrowsRotate}/></button>
             </div>
             <div className="filter">
-                    <button className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
+                    <button onClick={filterIntersections} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
                     <div className='filter-2'>showing {totalIntersections} intersections</div>
+            </div>
+            <div className={`filter-bar shadow ${isFiltering ? '': 'hidden'}`}>
+                <div className='blocked-open'>
+                    <div>BLOCKED</div>
+                    <div>OPEN</div>
+                </div>
+                <span>|</span>
+                <div className='working-notworking'>
+                    <div>WORKING</div>
+                    <div>NOT WORKING</div>
+                </div>
             </div>
             <div className="intersection-list">
                 <div className="intersection-list">
