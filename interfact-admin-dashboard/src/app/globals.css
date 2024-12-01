@@ -8,31 +8,105 @@ body {
 .shadow{
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06); 
 }
-/* 
-Maybe a homescreen to enter
 
-.interfact-home-logo{
-  font-family: 'outfit';
-  color: white;
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  font-size: 4em;
-  flex-direction: column;
-  width: 500px;
-  margin: 0 auto;
-  font-weight: 700;
-  background-color: #0B0D0E;
-  border-radius: 20px;
-  padding: 150px;
-  margin-top: 150px;
+.hidden{
+  visibility:hidden;
+  position: absolute;
 }
 
-.interfact-home-logo2{
-  font-size: .5em;
-} */
+.home-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin: 17px; 
+  box-sizing: border-box; 
+}
 
+.home-left,
+.home-right {
+  flex: 2; 
+  height: calc(100vh - 40px); 
+  width: calc(100vw / 2 - 20px); 
+  box-sizing: border-box;
+}
 
+.home-left {
+  flex: 4;
+  background-color: #293029;
+  border-radius: 10px;
+}
+.home-right {
+  flex: 2;
+  margin-left: 20px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  font-family: 'outfit';
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.home-right input{
+  margin-bottom: 20px;
+  width: 200px;
+  border: 4px solid #1d2022;
+  text-align: center;
+  font-family: 'outfit';
+}
+.home-right button{
+  padding: 10px;
+  border: 2px solid #1d2022;
+  transition: all .1s;
+}
+.home-right button:hover{
+  scale: 1.05;
+  border-radius: 10px;
+}
+.home-right form{
+  display: flex;
+  flex-direction: column;
+}
+.home-train-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Home Screen Logo */
+.logo-2 img{
+  width: 35px;
+  height: 35px;
+}
+
+.logo-2{
+  margin: 10px;
+  position: absolute;
+  font-family: 'outfit';
+  font-weight: 700;
+  width: 230px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8em;
+  gap: 15px;
+  border-radius: 8px;
+  color: #1d2022;
+  padding: 8px;
+}
+
+.logo-words-2{
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.logo3-2{
+  font-size: .4em;
+}
+
+/* Nav logo */
 .logo img{
   width: 35px;
   height: 35px;
@@ -64,6 +138,8 @@ Maybe a homescreen to enter
 }
 
 
+
+
 .nav-container{
   display: flex;
   gap: 30px;
@@ -89,7 +165,7 @@ Maybe a homescreen to enter
   text-decoration: none;
   font-size: 1.2em;
   color: #1d2022;
-  font-weight: 400;
+  font-weight: 700;
   padding: 10px;
   border-radius: 13px;
 
@@ -132,13 +208,21 @@ Maybe a homescreen to enter
 
 .dash-main-2{
   margin-top: 30px;
-  color: #535353;
-  font-size: 1.2em;
+  font-size: 1.3em;
+  color: #1d2022;
+}
+.dash-main-2 span{
+  font-size: .9em;
+  color: #1d2022;
 }
 
 .dash-main-3{
-  font-size: 1.2em;
-  color: #535353;
+  font-size: 1.3em;
+  color: #1d2022;
+}
+.dash-main-3 span{
+  font-size: .9em;
+  color: #1d2022;
 }
 
 .filter{
@@ -169,6 +253,49 @@ Maybe a homescreen to enter
   padding: 4px;
   
 }
+
+.filter-bar{
+  display: flex;
+  background-color: white;
+  height: 60px;
+  margin-top: 20px;
+  margin-left: 70px;
+  margin-right: 70px;
+  border-radius: 20px;
+  flex-direction: row;
+  gap: 20px;
+  font-family: 'outfit';
+  align-items: center;
+  color: white;
+  transition: all .1s;
+}
+.filter-bar span{
+  color: #1d2022;
+  font-weight: 900;
+}
+.blocked-open{
+  margin-left: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.blocked-open div:hover{
+  cursor: pointer;
+  scale: 1.04;
+}
+.filter-option-blocked, .filter-option-open{
+  padding: 5px 8px 5px 8px;
+  border-radius: 25px;
+  background-color: #1d2022;
+  transition: all .1s;
+}
+.filter-option-open-selected, .filter-option-blocked-selected{
+  padding: 5px 8px 5px 8px;
+  border-radius: 25px;
+  background-color: #4c504c;
+  transition: all .1s;
+}
+
 
 .intersection-list {
   display: grid;
@@ -319,6 +446,7 @@ Maybe a homescreen to enter
   font-family: 'outfit';
   font-size: 1em;
   transition: all .1s;
+  width: 200px;
 }
 .map-view:hover{
   scale: 1.03;
@@ -326,6 +454,7 @@ Maybe a homescreen to enter
   background-color: white;
   color: #1d2022;
   border: 1px solid #1d2022;
+  width: 220px;
 }
 
 .refresh-button{
@@ -350,3 +479,223 @@ Maybe a homescreen to enter
   border: 1px solid #1d2022
 }
 
+.intersection-info{
+  display: flex;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 70px;
+  border-radius: 15px;
+}
+
+.intersection-info-left{
+  display: flex;
+  flex: 3;
+  height: 550px;
+  border-radius: 15px;
+}
+
+.intersection-info-right{
+  display: flex;
+  flex: 2;
+  background-color: white;
+  margin-left: 30px;
+  border-radius: 15px;
+  font-family: 'outfit';
+}
+
+.intersection-info-left img{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.intersection-info-name{
+  font-family: 'outfit';
+  font-size: 1.3em;
+  position: absolute;
+  background-color: #1d2022;
+  color: white;
+  padding: 15px 20px 15px 20px;
+  margin-left: 20px;
+  border-radius: 20px;
+}
+.intersection-info-name:hover{
+  cursor: default;
+  scale: 1.01;
+}
+
+.intersection-info-name span{
+  font-size: .8em;
+  color: #9c9c9c;
+}
+
+.intersection-info-right{
+  display: flex;
+  flex-direction: column;
+  font-family: 'outfit';
+  font-size: 1.1em;
+  font-weight: 500;
+  gap: 10px;
+  padding: 20px;
+  color: white;
+}
+
+.intersection-info-right h1{
+  color: #1d2022;
+  font-size: 1.3em;
+}
+
+.intersection-info-right div{
+  padding: 10px;
+  background-color: #1d2022;
+  border-radius: 10px;
+  transition: all .1s;
+  width: 97%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.intersection-info-right div:hover{
+  scale: 1.01;
+  width: 85%;
+}
+
+
+.intersection-info-right span{
+  font-size: .8em;
+  color: #9c9c9c;
+}
+
+.intersection-info-2{
+  display: flex;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 70px;
+  border-radius: 15px;
+  margin-top: 28px;
+}
+
+.intersection-reports{
+  display: flex;
+  flex: 6;
+  background-color: white;
+  border-radius: 15px;
+  flex-direction: column;
+  font-family: 'outfit';
+  margin-bottom: 100px;
+  transition: all .1s;
+}
+
+.intersection-reports h1{
+  display: flex;
+  margin-left: 24px;
+  font-size: 1.5em;
+  align-items: center;
+}
+.intersection-reports h1 span{
+  background-color:#fa4242;
+  padding: 2px 8px 2px 8px;
+  margin-left: 10px;
+  font-size: .8em;
+
+  border-radius: 50px;
+}
+
+.intersection-logs{
+  display: flex;
+  flex: 4;
+  background-color: white;
+  border-radius: 15px;
+  margin-left: 28px;
+  font-family: 'outfit';
+
+}
+
+.report-item-1{
+  background-color: #1d2022;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  font-size: .8em;
+  width: 90%;
+  transition: all .1s;
+}
+.report-item-1 a{
+  color: #9c9c9c;
+}
+.report-item-1:hover{
+  scale: 1.01;
+  width: 85%;
+}
+
+.intersection-logs h1{
+  display: flex;
+  margin-left: 24px;
+  font-size: 1.5em;
+
+}
+
+.camera-add-main{
+  display: flex;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 70px;
+
+}
+
+.camera-add-left{
+  display: flex;
+  flex: 2;
+  background-color: white;
+  height: 600px;
+  border-radius: 15px;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'outfit';
+}
+
+.camera-add-left h1{
+  display: flex;
+  margin-top: 60px;
+}
+
+.camera-add-left hr{
+  width: 50px;
+  margin-bottom: 20px;
+}
+
+.camera-add-right{
+  display: flex;
+  flex: 8;
+}
+
+.camera-add-form{
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-add-form-submit{
+  margin-top: 50px;  
+  border: 2px solid #1d2022;
+  width: 230px;
+  height: 40px;
+  transition: all .1s;
+}
+.camera-add-form-submit:hover{
+  scale: 1.04;
+  border-radius: 8px;
+}
+
+.camera-add-form input{
+  border: 2px solid #1d2022;
+}
+
+.camera-add-form label{
+  margin-top: 10px;
+}
