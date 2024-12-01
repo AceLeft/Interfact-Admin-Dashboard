@@ -27,8 +27,7 @@ export default function Home() {
               </div>
             </div>
 
-            <img className="home-train-image" src="home-locomotive.jpg" alt="" />
-
+            <img className="home-train-image" src="home-train5.webp" alt="" />
         </div>
           
         <div className="home-right shadow">
