@@ -13,7 +13,7 @@ import { collection } from 'firebase/firestore';
 
 export default function Home() {
 
-    const intersections = useIntersections(collection(db, "intersections"));
+    const intersections = useIntersections();
     const userFeedback = useUserFeedback();
 
     

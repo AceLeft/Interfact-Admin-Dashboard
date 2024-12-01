@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CollectionReference, onSnapshot } from "firebase/firestore";
+import { collection, CollectionReference, Firestore, getFirestore, onSnapshot } from "firebase/firestore";
 
 
 export interface Intersection {
@@ -12,13 +12,13 @@ export interface Intersection {
     timestamp: string;
 }
 
-export const useIntersections = (intersectionCollection : CollectionReference) => {
+export const useIntersections = () => {
     const [intersections, setIntersections] = useState<Intersection[]>([]);
-
+    const db = getFirestore();
     //runs every rerender
     useEffect(() => {
         //                               data                      func called for each piece of data     
-        const unsubscribe = onSnapshot(intersectionCollection, (snapshot) => {
+        const unsubscribe = onSnapshot(collection(db, "intersections"), (snapshot) => {
             //param is a QuerySnapshot (collection of data)
             // snapshots.docs is all documents (QueryDocumentSnapshots) in the snapshot
             const data = snapshot.docs.map(doc => {
