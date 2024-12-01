@@ -5,12 +5,12 @@ import React from 'react'
 
  
 describe('Home', () => {
-  // it('renders a filter for intersections', () => {
-  //   render(<Home />)
+  it('has no created intersections', () => {
+    render(<Home />)
  
-  //   const intersectionList = screen.getByRole('Filter')
+    const intersectionList = screen.getByText("showing 0 intersections", {exact: false})
  
-  //   expect(intersectionList).toBeInTheDocument()
-  // })
+    expect(intersectionList).toBeInTheDocument()
+  })
   
 })

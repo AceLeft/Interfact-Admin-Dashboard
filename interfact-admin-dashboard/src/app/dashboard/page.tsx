@@ -7,8 +7,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
-import { db } from "../../../FirebaseConfig";
-import { collection } from 'firebase/firestore';
+
 
 
 export default function Home() {

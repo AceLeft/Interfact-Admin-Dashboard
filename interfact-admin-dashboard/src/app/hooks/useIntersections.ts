@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { collection, CollectionReference, Firestore, getFirestore, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../../FirebaseConfig";
 
 
 export interface Intersection {
@@ -14,7 +15,6 @@ export interface Intersection {
 
 export const useIntersections = () => {
     const [intersections, setIntersections] = useState<Intersection[]>([]);
-    const db = getFirestore();
     //runs every rerender
     useEffect(() => {
         //                               data                      func called for each piece of data     

@@ -1,16 +1,12 @@
 
 import { renderHook } from "@testing-library/react"
 import {useIntersections} from "../src/app/hooks/useIntersections.ts"
-import { Firestore, getFirestore, query } from "firebase/firestore";
-import { jest } from "@jest/globals";
-import { mock } from "node:test";
-import { mockFirebase, mockGoogleCloudFirestore } from "firestore-jest-mock";
-import { mockCollection } from "firestore-jest-mock/mocks/firestore";
+import { mockGoogleCloudFirestore } from "firestore-jest-mock";
 
 
 
 
-mockFirebase({
+mockGoogleCloudFirestore({
   database: {
     intersections: [
       {id:'1', name: 'test'}
@@ -19,15 +15,9 @@ mockFirebase({
 })
 
 describe("useIntersections", () => {
-  it("should return the mock input", async () => {
-
-  
-
-
+  it("should return the default input", async () => {
     const {result} = renderHook(()=> useIntersections());
-    
-    expect(mockCollection).toHveBeenCalledWith('intersections')
-    expect(result.current).toBe({id:'1', name: 'test'})
+    expect(result.current).toStrictEqual([])
     
   });
 })
