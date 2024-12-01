@@ -21,6 +21,7 @@ function calculateDifferenceInMinutes(date: string): number {
         
       //Get the current time in UTC
       let currentTime = DateTime.now().toUTC();
+      console.log(DateTime.now());
   
       //Calculate the difference in minutes
       let differenceInMinutes = currentTime.diff(cameraTimeInUTC, "minutes").minutes;
@@ -28,6 +29,7 @@ function calculateDifferenceInMinutes(date: string): number {
       return Math.round(differenceInMinutes) || 0;
     } catch (error) {
       console.error(error);
+      console.error(cameraTimestamp);
       return 0;
     }
   };

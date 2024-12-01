@@ -16,9 +16,7 @@ jest.mock("next/navigation", () => ({
 describe('Home', () => {
   it('has no created intersections', () => {
 
-    render(
-         <Home />
-  )
+    render(<Home />)
  
     const intersectionList = screen.getByText("showing 0 intersections", {exact: false})
  
