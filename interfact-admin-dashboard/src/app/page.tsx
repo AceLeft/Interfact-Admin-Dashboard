@@ -26,7 +26,7 @@ export default function Home() {
                 <span className="logo3-2">ADMIN DASHBOARD</span>
               </div>
             </div>
-            <img className="home-train-image" src="home-train4.png" alt="" />
+            <img className="home-train-image shadow" src="home-train4.png" alt="" />
         </div>
           
         <div className="home-right shadow">

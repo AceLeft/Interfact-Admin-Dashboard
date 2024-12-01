@@ -8,27 +8,35 @@ import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function Home() {
+
+export default function Dashboard() {
 
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
     const router = useRouter();
 
-    const [isFiltering, setIsFiltering] = useState<boolean | null>(null);
+    const [ isFiltering, setIsFiltering ] = useState<boolean | null>(null);
+    const [ isFilterOpen, setIsFilterOpen ] = useState<boolean | null>(false);
+    const [ isFilterBlocked, setIsFilterBlocked ] = useState<boolean | null>(false);
 
-    const [ isFilterOpen, setIsFilterOpen] = useState<boolean | null>(null);
-    const [ isFilterBlocked, setIsFilterBlocked] = useState<boolean | null>(null);
-    const [ isFilterWorking, setIsFilterWorking] = useState<boolean | null>(null);
-    const [ isFilterNotWorking, setIsFilterNotWorking] = useState<boolean | null>(null);
+    const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
 
+    const [refreshKey, setRefreshKey] = useState<number>(0);
 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
     }, 0);
 
     const totalIntersections = intersections.length;
+
+    const refreshPage = () => {
+        setRefreshKey((prevKey) => prevKey + 1); 
+        setIsFiltering(null)
+        setIsFilterOpen(false)
+        setIsFilterBlocked(false)
+    };
 
     const getReportsForIntersection = (intersectionId: string) => {
         return userFeedback.reduce((total, user) => {
@@ -50,13 +58,42 @@ export default function Home() {
         setIsFiltering(!isFiltering) 
     } 
 
-    const filterOptions = () => {
-        //TODO
-    }
+    const filterOptions = (selectedOption: string) => {
+        switch (selectedOption) {
+            case 'Open':
+                if(isFilterBlocked !== true){
+                    setIsFilterOpen(!isFilterOpen)
+                }
+                break;
+            case 'Blocked':
+                if(isFilterOpen !== true){
+                    setIsFilterBlocked(!isFilterBlocked)
+                }
+                break;
+            default:
+                console.warn(`Unknown filter option: ${selectedOption}`);
+                break;
+        }
+    };
+
+    const filteredIntersections = intersections.filter((item) => {
+        if (isFilterOpen) return item.status === 'OPEN';
+        if (isFilterBlocked) return item.status === 'BLOCKED';
+        return true; // No filters applied
+    });
+
+    useEffect(() => {
+        setintersectionsShown(filteredIntersections.length);
+    }, [filteredIntersections]);
+    
 
     const interfactLiveRedirect = () => {
         window.open('https://interfact.live/map', '_blank');
       };
+
+    const goToAddCamera = () =>{
+        router.push("/add_camera")
+    }
 
     const calculateDifferenceInMinutes = (date: string): number => {
         // const cameraTimestamp = "November 27, 2024 at 04:17:00PM UTC-4";
@@ -76,16 +113,13 @@ export default function Home() {
 
           //Convert parsed time to UTC
           const cameraTimeInUTC = parsedTime.toUTC();
-          console.log("Camera time in UTC:", cameraTimeInUTC.toISO()); // Debug log
-      
+            
           //Get the current time in UTC
           const currentTime = DateTime.now().toUTC();
-          console.log("Current time in UTC:", currentTime.toISO()); // Debug log
       
           //Calculate the difference in minutes
           const differenceInMinutes = currentTime.diff(cameraTimeInUTC, "minutes").toObject().minutes;
-      
-          console.log("Difference in minutes:", Math.round(differenceInMinutes)); // Final log
+    
           return Math.round(differenceInMinutes) || 0;
         } catch (error) {
           console.error(error);
@@ -103,47 +137,69 @@ export default function Home() {
                     <div className="dash-main-3">Problems Reported (Last 30 days) | <span>{getTotalReports}</span></div>
                 </div>
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
-                <button className='refresh-button'><FontAwesomeIcon icon={faArrowsRotate}/></button>
+                <button onClick={refreshPage} className='refresh-button'><FontAwesomeIcon icon={faArrowsRotate}/></button>
             </div>
             <div className="filter">
                     <button onClick={filterIntersections} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
-                    <div className='filter-2'>showing {totalIntersections} intersections</div>
+                    <div className='filter-2'>showing {intersectionsShown} intersections</div>
             </div>
             <div className={`filter-bar shadow ${isFiltering ? '': 'hidden'}`}>
                 <div className='blocked-open'>
-                    <div>BLOCKED</div>
-                    <div>OPEN</div>
-                </div>
-                <span>|</span>
-                <div className='working-notworking'>
-                    <div>WORKING</div>
-                    <div>NOT WORKING</div>
+                <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
+                    <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
                 </div>
             </div>
             <div className="intersection-list">
                 <div className="intersection-list">
                 
-                    {intersections.map((item) => (
-                        <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
-                            <div className="item-img-container">
-                                <img src={item.imagepath} alt={item.name} />
-                                <div className="item-reports">{getReportsForIntersection(item.id)}</div>
-                                <div className="item-name">{item.name}</div>
-                            </div>
-                            <div className="item-info-container">
-                                <div className="item-last-update"><span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago</div>
-                                <div className="item-status"><span>Image Classification | </span> {item.status}</div>
-                                <div className='item-down'><span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working": "Not Working"}</div>  
-                            </div>
-                            <div className={calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator": "bad-indicator"}></div>
-                        </div>
-                    ))}
-                    <div className='intersection-add shadow'>
-                        <div className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                    </div>
+                {Array.isArray(filteredIntersections) ? (
+                    filteredIntersections.map((item) => (
+            <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
+                <div className="item-img-container">
+                    <img src={item.imagepath} alt={item.name} />
+                    <div className="item-reports">{getReportsForIntersection(item.id)}</div>
+                    <div className="item-name">{item.name}</div>
                 </div>
-                
+            <div className="item-info-container">
+                <div className="item-last-update">
+                    <span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago
+                </div>
+                <div className="item-status">
+                    <span>Image Classification | </span> {item.status}
+                </div>
+                <div className="item-down">
+                    <span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
+                </div>
+            </div>
+            <div
+                className={
+                    calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
+                }
+            ></div>
+        </div>
+    ))) : (
+        <div>
+            {intersections.map((item) => (
+                <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
+                    <div className="item-img-container">
+                        <img src={item.imagepath} alt={item.name} />
+                        <div className="item-reports">{getReportsForIntersection(item.id)}</div>
+                        <div className="item-name">{item.name}</div>
+                    </div>
+                    <div className="item-info-container">
+                        <div className="item-last-update"><span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago</div>
+                        <div className="item-status"><span>Image Classification | </span> {item.status}</div>
+                        <div className='item-down'><span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working": "Not Working"}</div>  
+                    </div>
+                    <div className={calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator": "bad-indicator"}></div>
+                </div>
+            ))}
+        </div>)}
+                <div className='intersection-add shadow'>
+                    <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
+                </div>
             </div>
         </div>
+     </div>
     );
 }
