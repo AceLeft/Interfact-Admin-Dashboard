@@ -279,30 +279,21 @@ body {
   flex-direction: row;
   gap: 20px;
 }
-.blocked-open div{
-  padding: 5px 8px 5px 8px;
-  border-radius: 25px;
-  background-color: #1d2022;
-  transition: all .1s;
-}
 .blocked-open div:hover{
   cursor: pointer;
   scale: 1.04;
 }
-.working-notworking{
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-}
-.working-notworking div{
+.filter-option-blocked, .filter-option-open{
   padding: 5px 8px 5px 8px;
   border-radius: 25px;
   background-color: #1d2022;
   transition: all .1s;
 }
-.working-notworking div:hover{
-  cursor: pointer;
-  scale: 1.04;
+.filter-option-open-selected, .filter-option-blocked-selected{
+  padding: 5px 8px 5px 8px;
+  border-radius: 25px;
+  background-color: #4c504c;
+  transition: all .1s;
 }
 
 
@@ -648,4 +639,63 @@ body {
   margin-left: 24px;
   font-size: 1.5em;
 
+}
+
+.camera-add-main{
+  display: flex;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 70px;
+
+}
+
+.camera-add-left{
+  display: flex;
+  flex: 2;
+  background-color: white;
+  height: 600px;
+  border-radius: 15px;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'outfit';
+}
+
+.camera-add-left h1{
+  display: flex;
+  margin-top: 60px;
+}
+
+.camera-add-left hr{
+  width: 50px;
+  margin-bottom: 20px;
+}
+
+.camera-add-right{
+  display: flex;
+  flex: 8;
+}
+
+.camera-add-form{
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-add-form-submit{
+  margin-top: 50px;  
+  border: 2px solid #1d2022;
+  width: 230px;
+  height: 40px;
+  transition: all .1s;
+}
+.camera-add-form-submit:hover{
+  scale: 1.04;
+  border-radius: 8px;
+}
+
+.camera-add-form input{
+  border: 2px solid #1d2022;
+}
+
+.camera-add-form label{
+  margin-top: 10px;
 }
