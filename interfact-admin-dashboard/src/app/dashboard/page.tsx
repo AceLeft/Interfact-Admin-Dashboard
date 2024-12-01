@@ -1,6 +1,5 @@
 'use client';
 // @ts-ignore
-import { DateTime } from 'luxon';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +8,7 @@ import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import calculateDifferenceInMinutes from "./timeCaculator";
 
 
 export default function Dashboard() {
@@ -96,37 +96,7 @@ export default function Dashboard() {
         router.push("/add_camera")
     }
 
-    const calculateDifferenceInMinutes = (date: string): number => {
-        // const cameraTimestamp = "November 27, 2024 at 04:17:00PM UTC-4";
-        const cameraTimestamp = date;
-      
-        try {
-          //Parse the camera timestamp with UTC-4
-          const parsedTime = DateTime.fromFormat(
-            cameraTimestamp,
-            "MMMM d, yyyy 'at' hh:mm:ssa 'UTC'Z", 
-            { zone: "UTC-4" }
-          );
-      
-          if (!parsedTime.isValid) {
-            throw new Error("Invalid timestamp format");
-          }
-
-          //Convert parsed time to UTC
-          const cameraTimeInUTC = parsedTime.toUTC();
-            
-          //Get the current time in UTC
-          const currentTime = DateTime.now().toUTC();
-      
-          //Calculate the difference in minutes
-          const differenceInMinutes = currentTime.diff(cameraTimeInUTC, "minutes").toObject().minutes;
     
-          return Math.round(differenceInMinutes) || 0;
-        } catch (error) {
-          console.error(error);
-          return 0;
-        }
-      };
       
     return(
         <div>
