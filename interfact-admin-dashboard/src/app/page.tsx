@@ -9,7 +9,7 @@ export default function Home() {
   const enterPasskey = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (passkey === "interfact") {
-      router.push("/dashboard"); // Navigate to the dashboard
+      router.push("/cities"); 
     } else {
       console.log("Invalid passkey");
     }
