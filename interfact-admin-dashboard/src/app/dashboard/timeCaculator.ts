@@ -8,11 +8,11 @@ function calculateDifferenceInMinutes(date: string): number {
       //Parse the camera timestamp with UTC-4
       let parsedTime = DateTime.fromFormat(
         cameraTimestamp,
-        "MMMM d, yyyy 'at' hh:mm:ssa 'UTC'Z", 
+        "MMMM d',' yyyy 'at' hh':'mm':'ssa 'UTC'Z", 
         { zone: "UTC-4" }
       );
-  
-      if (!parsedTime.isValid) {
+      console.log(parsedTime);
+      if (parsedTime.invalidReason != null) {
         throw new Error("Invalid timestamp format");
       }
 
@@ -29,7 +29,6 @@ function calculateDifferenceInMinutes(date: string): number {
       return Math.round(differenceInMinutes) || 0;
     } catch (error) {
       console.error(error);
-      console.error(cameraTimestamp);
       return 0;
     }
   };
