@@ -1,39 +1,15 @@
 import { useState, useEffect } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../../FirebaseConfig";
-
-export interface Report {
-    classification: string;
-    reportid: string;
-    reporturl: string;
-}
-
-export interface UserFeedback {
-    id: string;
-    reports: Report[];
-    requests: string[];
-}
-
+import { UserFeedback } from "../types/Firebase/userFeedbackFB";
+import { getUserFeedbackFB } from "../DAOs/Firebase/userFeedbackDAO";
 
 export const useUserFeedback = () => {
     const [userFeedback, setUserFeedback] = useState<UserFeedback[]>([]);
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-            const data = snapshot.docs.map(doc => {
-                const docData = doc.data();
+        // Use the DAO to fetch data
+        const unsubscribe = getUserFeedbackFB(setUserFeedback);
 
-                return {
-                    id: doc.id,
-                    reports: Array.isArray(docData.reports) ? docData.reports : [],
-                    requests: Array.isArray(docData.requests) ? docData.requests : []
-                } as UserFeedback;
-            });
-
-            setUserFeedback(data);
-        });
-
-        return () => unsubscribe(); 
+        return () => unsubscribe();
     }, []);
 
     return userFeedback;
