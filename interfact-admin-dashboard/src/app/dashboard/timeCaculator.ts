@@ -29,7 +29,7 @@ function calculateDifferenceInMinutes(date: string): number {
       return Math.round(differenceInMinutes) || 0;
     } catch (error) {
       console.error(error);
-      return 0;
+      return NaN;
     }
   };
 
