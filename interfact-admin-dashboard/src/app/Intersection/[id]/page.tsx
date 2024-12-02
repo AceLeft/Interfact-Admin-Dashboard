@@ -3,7 +3,8 @@ import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
-import { Report } from '@/app/hooks/useUserFeedback';
+import { Report } from '@/app/types/Firebase/reportFB';
+
 
 const IntersectionPage = () => {
 
