@@ -20,10 +20,7 @@ const IntersectionPage = () => {
     const [intersectionStatus, setIntersectionStatus] = useState<string | null>(null);
     const [intersectionTimestamp, setIntersectionTimestamp] = useState<string | null>(null);
 
-    
-
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
-
 
     useEffect(() => {
         if (id) {
@@ -61,11 +58,6 @@ const IntersectionPage = () => {
     }, [userFeedback, id]);
       
 
-    const handleClick = () =>{
-        
-        console.log(userFeedback)
-    }
-
     return (
         <div>
             <div className='intersection-info'>
@@ -93,7 +85,7 @@ const IntersectionPage = () => {
                             <div className='report-item-1'>Image | <a href={report.reporturl} target="_blank">{report.reporturl}</a> 
                                 <br /> 
                                 <br />
-                                Classification | <span>BLOCKED</span>
+                                Classification | <span>{report.classification}</span>
                             </div>
                         </div>
                     ))) : (<p>No reports found for this intersection.</p>)}

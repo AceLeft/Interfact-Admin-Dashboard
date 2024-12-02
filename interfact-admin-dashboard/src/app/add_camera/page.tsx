@@ -10,12 +10,14 @@ export default function AddCamera() {
 
     const intersections = useIntersections();
 
+    const noImage = 'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg'
+
     const [formData, setFormData] = useState({
         id: '',
         name: '',
         latitude: '',
         longitude: '',
-        imagepath: 'https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg',
+        imagepath: noImage,
         status: '',
         timestamp: ''
       });
@@ -36,7 +38,7 @@ export default function AddCamera() {
             await setDoc(docRef, formData);
 
 
-            setFormData({ id: '', name: '', latitude: '', longitude: '', imagepath: '', status: '', timestamp: ''});
+            setFormData({ id: '', name: '', latitude: '', longitude: '', imagepath: noImage, status: '', timestamp: ''});
           } catch (error) {
             console.error('Error adding document: ', error);
             alert('Failed to add camera. Please try again.');

@@ -3,9 +3,10 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../../FirebaseConfig";
 
 export interface Report {
+    classification: string;
     reportid: string;
     reporturl: string;
-  }
+}
 
 export interface UserFeedback {
     id: string;

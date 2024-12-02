@@ -3,9 +3,6 @@ import { renderHook } from "@testing-library/react"
 import {useIntersections} from "../src/app/hooks/useIntersections.ts"
 import { mockGoogleCloudFirestore } from "firestore-jest-mock";
 
-
-
-
 mockGoogleCloudFirestore({
   database: {
     intersections: [

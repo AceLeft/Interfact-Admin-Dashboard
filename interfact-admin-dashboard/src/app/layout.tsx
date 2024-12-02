@@ -34,16 +34,13 @@ export default function RootLayout({
               <span className="logo3">ADMIN DASHBOARD</span>
             </div>
           </div>
-          <Link href={"/"} className="nav-home">
+          <Link href={"/dashboard"} className="nav-dashboard">
             HOME
           </Link>
-          <Link href={"/dashboard"} className="nav-dashboard">
-            DASHBOARD
-          </Link>
-          <Link href={""} className="nav-locations">
+          <Link href={"/cities"} className="nav-locations">
             CITIES
           </Link>
-          <Link href={""} className="nav-requests">
+          <Link href={"/requests"} className="nav-requests">
             REQUESTS
           </Link>
         </div>
