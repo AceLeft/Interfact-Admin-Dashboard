@@ -92,7 +92,7 @@ body {
   font-size: 1.8em;
   gap: 15px;
   border-radius: 8px;
-  color: #1d2022;
+  color: white;
   padding: 8px;
 }
 
@@ -653,7 +653,7 @@ body {
   display: flex;
   flex: 2;
   background-color: white;
-  height: 600px;
+  height: 500px;
   border-radius: 15px;
   flex-direction: column;
   align-items: center;
@@ -670,9 +670,12 @@ body {
   margin-bottom: 20px;
 }
 
-.camera-add-right{
-  display: flex;
+.camera-add-right {
   flex: 8;
+  background-color: white;
+  border-radius: 15px;
+  margin-left: 25px;
+  display: block; 
 }
 
 .camera-add-form{
@@ -686,10 +689,12 @@ body {
   width: 230px;
   height: 40px;
   transition: all .1s;
+  font-weight: 700;
 }
 .camera-add-form-submit:hover{
   scale: 1.04;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .camera-add-form input{
@@ -698,4 +703,35 @@ body {
 
 .camera-add-form label{
   margin-top: 10px;
+}
+
+.camera-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  margin-left: 20px;
+}
+
+.camera-list-item{
+  margin: 20px;
+  display: flex;
+  border-radius: 15px;
+  width: 200px;
+  height: 200px;
+}
+
+.camera-list-item h1{
+  position: absolute;
+  background-color: white;
+  padding: 7px;
+  border-radius: 10px;
+  margin: 6px;
+  font-family: 'outfit';
+  font-size: 1.1em;
+}
+
+.camera-list-item img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
 }
