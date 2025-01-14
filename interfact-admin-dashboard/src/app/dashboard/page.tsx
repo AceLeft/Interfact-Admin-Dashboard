@@ -121,56 +121,37 @@ export default function Dashboard() {
                 </div>
             </div>
             <div className="intersection-list">
-                <div className="intersection-list">
                 
                 {Array.isArray(filteredIntersections) ? (
                     filteredIntersections.map((item) => (
-            <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
-                <div className="item-img-container">
-                    <img src={item.imagepath} alt={item.name} />
-                    <div className="item-reports">{getReportsForIntersection(item.id)}</div>
-                    <div className="item-name">{item.name}</div>
-                </div>
-            <div className="item-info-container">
-                <div className="item-last-update">
-                    <span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago
-                </div>
-                <div className="item-status">
-                    <span>Image Classification | </span> {item.status}
-                </div>
-                <div className="item-down">
-                    <span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
-                </div>
-            </div>
-            <div
-                className={
-                    calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
-                }
-            ></div>
-        </div>
-    ))) : (
-        <div>
-            {intersections.map((item) => (
                 <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
                     <div className="item-img-container">
                         <img src={item.imagepath} alt={item.name} />
                         <div className="item-reports">{getReportsForIntersection(item.id)}</div>
                         <div className="item-name">{item.name}</div>
                     </div>
-                    <div className="item-info-container">
-                        <div className="item-last-update"><span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago</div>
-                        <div className="item-status"><span>Image Classification | </span> {item.status}</div>
-                        <div className='item-down'><span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working": "Not Working"}</div>  
+                <div className="item-info-container">
+                    <div className="item-last-update">
+                        <span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago
                     </div>
-                    <div className={calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator": "bad-indicator"}></div>
+                    <div className="item-status">
+                        <span>Image Classification | </span> {item.status}
+                    </div>
+                    <div className="item-down">
+                        <span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
+                    </div>
                 </div>
-            ))}
-        </div>)}
+                <div
+                    className={
+                        calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
+                    }
+                ></div>
+        </div>
+    ))) : (<div></div>)}
                 <div className='intersection-add shadow'>
                     <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
                 </div>
             </div>
         </div>
-     </div>
     );
 }
