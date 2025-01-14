@@ -299,13 +299,14 @@ body {
 
 .intersection-list {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
-  gap: 4rem;
-  padding: 1rem;
-  justify-items: center;
-  align-items: start;
-  margin-left: 20px;
-  margin-right: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  gap: 4rem; 
+  width: 100%;
+  max-width: 89vw; 
+  margin-top: 20px;
+  margin-bottom: 100px;
+  padding: 0.5rem; 
+  margin-left: 70px;
 }
 
 .intersection-item {
@@ -709,10 +710,10 @@ body {
 
 .camera-list {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
-  margin-left: 20px;
-  padding-bottom: 15px;
-  padding-right: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); 
+  gap: 1rem;
+  padding: 1rem;
+  justify-items: center;
 }
 
 .camera-list-item{
