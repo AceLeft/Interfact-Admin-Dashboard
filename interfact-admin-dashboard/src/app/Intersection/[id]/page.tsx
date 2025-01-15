@@ -4,7 +4,7 @@ import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
 import { Report } from '@/app/types/Firebase/reportFB';
-
+import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 
 const IntersectionPage = () => {
 
@@ -12,28 +12,16 @@ const IntersectionPage = () => {
     const intersections = useIntersections();
     const params = useParams();
     const [reports, setReports] = useState<Report[] | null>([]);
-    //intersection db attributes
-    const [intersectionId, setIntersectionId] = useState<string | null>(null);
-    const [intersectionImagePath, setIntersectionImagePath] = useState<string | null>(null);
-    const [intersectionLatitude, setIntersectionLatitude] = useState<number | null>(null);
-    const [intersectionLongitude, setIntersectionLongitude] = useState<number | null>(null);
-    const [intersectionName, setIntersectionName] = useState<string | null>(null);
-    const [intersectionStatus, setIntersectionStatus] = useState<string | null>(null);
-    const [intersectionTimestamp, setIntersectionTimestamp] = useState<string | null>(null);
+
+    const [intersection, setIntersection] = useState<Intersection | null>(null);
 
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
     useEffect(() => {
         if (id) {
-            const intersectionID = intersections.find((item) => item.id === id);
-            if (intersectionID) {
-                setIntersectionId(intersectionID.id);
-                setIntersectionImagePath(intersectionID.imagepath);
-                setIntersectionLatitude(intersectionID.latitude);
-                setIntersectionLongitude(intersectionID.longitude);
-                setIntersectionName(intersectionID.name);
-                setIntersectionStatus(intersectionID.status)
-                setIntersectionTimestamp(intersectionID.timestamp)
+            const intersectionFound: Intersection | undefined = intersections.find((item) => item.id === id);
+            if (intersectionFound) {
+                setIntersection(intersectionFound)
             }
         }
     }, [id, intersections]);
@@ -63,18 +51,18 @@ const IntersectionPage = () => {
         <div>
             <div className='intersection-info'>
                 <div className='intersection-info-left shadow'>
-                    <h1 className='intersection-info-name shadow'>{intersectionName} <span>({id})</span></h1>
-                    <img src={intersectionImagePath || "/no-image.webp"}/>
+                    <h1 className='intersection-info-name shadow'>{intersection ? intersection.name : ""} <span>({id})</span></h1>
+                    <img src={intersection ? intersection.imagepath || "/no-image.webp" : "" }/>
                 </div>
                 <div className='intersection-info-right shadow'>
                     <h1>Camera Details</h1>
-                    <div>Id | <span>{intersectionId}</span></div>
-                    <div>Imagepath | <span>{intersectionImagePath}</span></div>
-                    <div>Latitude | <span>{intersectionLatitude}</span></div>
-                    <div>Longitude | <span>{intersectionLongitude}</span></div>
-                    <div>Name | <span>{intersectionName}</span></div>
-                    <div>Status | <span>{intersectionStatus}</span></div>
-                    <div>Timestamp | <span>{intersectionTimestamp}</span></div>
+                    <div>Id | <span>{intersection ? intersection.id : ""}</span></div>
+                    <div>Imagepath | <span>{intersection ? intersection.imagepath : ""}</span></div>
+                    <div>Latitude | <span>{intersection ? intersection.latitude : ""}</span></div>
+                    <div>Longitude | <span>{intersection ? intersection.longitude : ""}</span></div>
+                    <div>Name | <span>{intersection ? intersection.name : ""}</span></div>
+                    <div>Status | <span>{intersection ? intersection.status : ""}</span></div>
+                    <div>Timestamp | <span>{intersection ? intersection.timestamp : ""}</span></div>
                 </div>
             </div>
             <div className="intersection-info-2">
