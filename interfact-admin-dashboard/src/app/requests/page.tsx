@@ -26,14 +26,13 @@ export default function requests() {
     // }, [userFeedback, id]);
 
 
-
     return(
         <div>
             <div className="request-main">
                 <h1>Camera Requests</h1>
                 <div className="request-container">
                     <div className="request-item shadow">
-                        HIG1    
+                        HIG1
                     </div>
                     <div className="request-item shadow">
                         STR1    
