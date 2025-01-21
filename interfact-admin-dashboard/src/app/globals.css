@@ -619,22 +619,77 @@ body {
 }
 
 .report-item-1{
+  
+  transition: all .1s;
+  flex: 1;
+}
+.report-item-1 span{
+  color: #9c9c9c;
+}
+.report-container{
+  transition: all .1s;
+  display: flex;
   background-color: #1d2022;
   color: white;
   padding: 20px;
   border-radius: 10px;
   margin-left: 20px;
-  margin-right: 20px;
   margin-bottom: 20px;
   font-size: .8em;
   width: 90%;
+}
+.report-container:hover{
+  scale: 1.02;
+}
+.report-image{
+  flex: 1;
+}
+
+.report-image img{
+  display: flex;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.report-buttons{
+  margin-top: 30px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
   transition: all .1s;
 }
-.report-item-1 a{
-  color: #9c9c9c;
+
+.report-buttons-text{
+  margin-top: 30px;
 }
-.report-item-1:hover{
-  scale: 1.02;
+
+.report-positive{
+  padding: 15px;
+  background-color: #42fa42;
+  font-size: 20px;
+  border-radius: 10px;
+}
+.report-negative{
+  padding: 15px;
+  background-color: #fa4242;
+  font-size: 20px;
+  border-radius: 10px;
+}
+
+.report-positive:hover, .report-negative:hover{
+  cursor: pointer;
+  scale: 1.05;
+}
+.report-item-1 hr{
+  display: flex;
+  width: 300px;
+  height: 2px;
+  border-color: #ebebeb;
+  background-color: #ebebeb;
+  position: absolute;
+  margin-top: 15px;
 }
 
 .intersection-logs h1{
@@ -825,3 +880,4 @@ body {
 .city-item-text2{
   color: #4c504c;
 }
+
