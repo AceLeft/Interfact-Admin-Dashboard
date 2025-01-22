@@ -103,10 +103,9 @@ export default function Dashboard() {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key.toLowerCase() === 'c') {
                 // Redirect to add camera page
-                router.push('interfact-admin-dashboard\src\app\add_camera\page.tsx');
+                router.push('/add_camera');
             }
         };
-
         document.addEventListener('keydown', handleKeyPress);
 
         return () => {
