@@ -61,16 +61,19 @@ export default function Dashboard() {
 
     const filterOptions = (selectedOption: string) => {
         switch (selectedOption) {
+            
             case 'Open':
                 if(isFilterBlocked !== true){
                     setIsFilterOpen(!isFilterOpen)
                 }
                 break;
+
             case 'Blocked':
                 if(isFilterOpen !== true){
                     setIsFilterBlocked(!isFilterBlocked)
                 }
                 break;
+
             default:
                 console.warn(`Unknown filter option: ${selectedOption}`);
                 break;
@@ -114,12 +117,18 @@ export default function Dashboard() {
                     <button onClick={filterIntersections} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
                     <div className='filter-2'>showing {intersectionsShown} intersections</div>
             </div>
+
             <div className={`filter-bar shadow ${isFiltering ? '': 'hidden'}`}>
                 <div className='blocked-open'>
+
+                {/* Calls filterOptions() onClick, passes open or closed as string depending on the button that is pressed */ }
+
                 <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
                     <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
+
                 </div>
             </div>
+
             <div className="intersection-list">
                 
                 {Array.isArray(filteredIntersections) ? (
@@ -148,6 +157,8 @@ export default function Dashboard() {
                 ></div>
         </div>
     ))) : (<div></div>)}
+
+    {/* Add camera item in list */ }
                 <div className='intersection-add shadow'>
                     <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
                 </div>
