@@ -83,7 +83,7 @@ export default function Dashboard() {
     const filteredIntersections = intersections.filter((item) => {
         if (isFilterOpen) return item.status === 'OPEN';
         if (isFilterBlocked) return item.status === 'BLOCKED';
-        return true; // No filters applied
+        //return true; // No filters applied
     });
 
     useEffect(() => {
@@ -98,8 +98,23 @@ export default function Dashboard() {
     const goToAddCamera = () =>{
         router.push("/add_camera")
     }
+    //------------------------------------------------------------------------------
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.key.toLowerCase() === 'c') {
+                // Redirect to add camera page
+                router.push('interfact-admin-dashboard\src\app\add_camera\page.tsx');
+            }
+        };
 
-    
+        document.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [router]);
+    //------------------------------------------------------------------------------
+
       
     return(
         <div>
