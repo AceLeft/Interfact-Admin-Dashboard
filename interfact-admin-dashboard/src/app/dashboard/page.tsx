@@ -21,6 +21,7 @@ export default function Dashboard() {
     const [ isFiltering, setIsFiltering ] = useState<boolean | null>(null);
     const [ isFilterOpen, setIsFilterOpen ] = useState<boolean | null>(false);
     const [ isFilterBlocked, setIsFilterBlocked ] = useState<boolean | null>(false);
+    const [ isFilterMaintenance, setIsFilterMaintenance ] = useState<boolean | null>(false);
 
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
         setIsFiltering(null)
         setIsFilterOpen(false)
         setIsFilterBlocked(false)
+        setIsFilterMaintenance(false)
     };
 
     const getReportsForIntersection = (intersectionId: string) => {
@@ -62,13 +64,18 @@ export default function Dashboard() {
     const filterOptions = (selectedOption: string) => {
         switch (selectedOption) {
             case 'Open':
-                if(isFilterBlocked !== true){
+                if(isFilterBlocked !== true || isFilterMaintenance !==true){
                     setIsFilterOpen(!isFilterOpen)
                 }
                 break;
             case 'Blocked':
-                if(isFilterOpen !== true){
+                if(isFilterOpen !== true || isFilterMaintenance !==true){
                     setIsFilterBlocked(!isFilterBlocked)
+                }
+                break;
+            case 'Maintenance':
+                if(isFilterOpen !== true || isFilterBlocked !== true){
+                    setIsFilterMaintenance(!isFilterMaintenance)
                 }
                 break;
             default:
@@ -80,6 +87,7 @@ export default function Dashboard() {
     const filteredIntersections = intersections.filter((item) => {
         if (isFilterOpen) return item.status === 'OPEN';
         if (isFilterBlocked) return item.status === 'BLOCKED';
+        if (isFilterMaintenance) return item.status === 'MAINTENANCE';
         return true; // No filters applied
     });
 
@@ -138,12 +146,12 @@ export default function Dashboard() {
                         <span>Image Classification | </span> {item.status}
                     </div>
                     <div className="item-down">
-                        <span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
+                        <span>Camera Status | </span> {item.status === "MAINTENANCE" ? "under_maintencance" : calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
                     </div>
                 </div>
                 <div
                     className={
-                        calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
+                        item.status === "MAINTENANCE" ? "maintenance-indicator" : calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
                     }
                 ></div>
         </div>
