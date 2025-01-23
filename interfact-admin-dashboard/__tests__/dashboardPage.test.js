@@ -218,4 +218,12 @@ describe('Home', () => {
 
     expect(mockPush).toHaveBeenCalledWith('/add_camera');
   });  
-});
+
+  it('should navoigate to the add camera page when "c" is pressed', () => {
+    render(<Home />);
+ 
+     fireEvent.keyDown(document, {key: 'c'});
+ 
+     expect(mockPush).toHaveBeenCalledWith('/add_camera');
+   });
+ });
