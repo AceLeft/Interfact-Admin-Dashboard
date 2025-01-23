@@ -369,7 +369,7 @@ body {
   color: #1d2022;
 }
 
-/* use for toggle between working/notworking */
+/* use for toggle between working/notworking/maintenace */
 .good-indicator{
   margin: 0 auto;
   background-color: #42fa42;
@@ -384,6 +384,15 @@ body {
   width: 50%;
   height: 7px;
   border-radius: 15px;
+}
+
+.maintenance-indicator{
+  margin: 0 auto;
+  background-color: #d67309;
+  width: 50%;
+  height: 7px;
+  border-radius: 15px;
+
 }
 
 .item-name{
