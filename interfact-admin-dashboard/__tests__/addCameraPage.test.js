@@ -1,24 +1,31 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, within, getByRole, getByText } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import React from 'react';
 import AddCamera from '../src/app/add_camera/page.tsx'
 import { useIntersections } from '../src/app/hooks/useIntersections';
-import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
-import { expect } from '@jest/globals';
-import { db } from '../FirebaseConfig.ts';
+import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
+import { getFirestore, connectFirestoreEmulator, collection, query, where, getDoc } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
 
+//Unsure if this needs something else
+const emulatorConfig = {
+    projectId: "demo-test",
+};
+
+const firebaseApp = initializeApp(emulatorConfig);
+//initializeApp has to be called before getFirestore
+const mockDB = getFirestore();
+connectFirestoreEmulator(mockDB, '127.0.0.1', 8080)
 
 // Mock useIntersections
 jest.mock('../src/app/hooks/useIntersections', () => ({
     useIntersections: jest.fn(),
 }));
 
-jest.mock('../FirebaseConfig.ts', () => ({
-    db: jest.fn(),
+jest.mock('../FirebaseConfig', () => ({
+    db: jest.fn( () => mockDB),
 }));
-// Cache original functionality (for mocking setFormData)
-const realUseState = React.useState
 
 const initialFormValues = {
     id: '',
@@ -30,33 +37,38 @@ const initialFormValues = {
     timestamp: ''
 }
 
-//i really don't know...
+
 
 describe("Add camera", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         jest.clearAllMocks();
+        let mockTestEnv = await initializeTestEnvironment({
+            projectId: "demo-test",
+            firestore: {host:"localhost", port:8080},
+        });
+        mockTestEnv.clearFirestore();
     });
 
-    it("adds a new empty camera on empty submit", () => {
+    it("adds a new empty camera on empty submit", async () => {
         useIntersections.mockReturnValue([]);
 
         const {getByText} = render(<AddCamera />);
 
         const submitButton = getByText("ADD");
         fireEvent.click(submitButton);
-        //i want to see that there is nothing in useIntersections
+        //i want to see that there is nothing stored
         //then when i click the button
         //there is one thing with initialFormValues in it
 
+        const camerasRef = collection(mockDB, "cameras");
+
+        /*this line to get a document doesn't work;
+        I don't know how to turn a CollectionReference into a DocumentReference
+        const addedCamera = await getDoc(camerasRef);*/
+
+        //Untrue, but would at least tell me what camerasRef has
+        expect(camerasRef).toEqual(initialFormValues);
+
     });
-
-    it("adds camera with data on submit", () => {
-
-
-        // Mock useState before rendering your component
-        jest
-        .spyOn(React, 'useState')
-        .mockImplementationOnce(() => realUseState(initialFormValues));
-    })
 
 });
