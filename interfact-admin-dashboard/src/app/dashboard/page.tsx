@@ -24,6 +24,7 @@ export default function Dashboard() {
     const [ isFiltering, setIsFiltering ] = useState<boolean | null>(null);
     const [ isFilterOpen, setIsFilterOpen ] = useState<boolean | null>(false);
     const [ isFilterBlocked, setIsFilterBlocked ] = useState<boolean | null>(false);
+    const [ isFilterMaintenance, setIsFilterMaintenance ] = useState<boolean | null>(false);
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
@@ -68,6 +69,7 @@ export default function Dashboard() {
         setIsFiltering(null)
         setIsFilterOpen(false)
         setIsFilterBlocked(false)
+        setIsFilterMaintenance(false)
     };
 
     // Navigate to intersection page by the intersection id
@@ -120,7 +122,7 @@ export default function Dashboard() {
             
             case 'Open':
                 // If blocked filter is not active
-                if(isFilterBlocked !== true){
+                if(isFilterBlocked !== true || isFilterMaintenance !==true){
                     // Toggle filter to open
                     setIsFilterOpen(!isFilterOpen)
                 }
@@ -128,9 +130,15 @@ export default function Dashboard() {
 
             case 'Blocked':
                 // If open filter is not active
-                if(isFilterOpen !== true){
+                if(isFilterOpen !== true || isFilterMaintenance !==true){
                     // Toggles filter to blocked
                     setIsFilterBlocked(!isFilterBlocked)
+                }
+                break;
+            
+                case 'Maintenance':
+                if(isFilterOpen !== true || isFilterBlocked !== true){
+                    setIsFilterMaintenance(!isFilterMaintenance)
                 }
                 break;
 
@@ -147,7 +155,10 @@ export default function Dashboard() {
 
         // Shows only blocked intersections if the filter is applied
         if (isFilterBlocked) return item.status === 'BLOCKED';
-        //return true; // No filters applied
+        
+        // Cameras under Maintenance
+        if (isFilterMaintenance) return item.status === 'MAINTENANCE';
+        return true; // No filters applied
     });
 
     // Updates # of intersections shown when filteredIntersections changes
