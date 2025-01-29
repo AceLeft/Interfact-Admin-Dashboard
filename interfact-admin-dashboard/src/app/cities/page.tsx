@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-export default function cities() {
+export default function Cities() {
 
     const router = useRouter();
 
