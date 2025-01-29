@@ -5,6 +5,7 @@ import Home from '../src/app/dashboard/page.tsx';
 import { useIntersections } from '../src/app/hooks/useIntersections';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
+import { main } from 'ts-node/dist/bin';
 
 // Mock useRouter:
 const mockPush = jest.fn();
@@ -144,6 +145,7 @@ function setUpForFilters() {
   fireEvent.click(filterButton);
 }
 
+
 describe("Dashboard filters", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -201,6 +203,30 @@ describe("Dashboard filters", () => {
     expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
     expect(screen.queryByText(filterIntersectionData[0].name)).not.toBeInTheDocument();
     expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+  });
+
+  it('when a second filter is selected, the other filters do not appear', () => {
+    setUpForFilters();
+    const maintenanceButton = screen.getByText((content, element) => {
+      return (
+        content === 'UNDER MAINTENANCE' &&
+        element.className.includes('filter-option-maintenance')
+      );
+    });
+    fireEvent.click(maintenanceButton);
+
+    const openButton = screen.getByText((content, element) => {
+      return (
+        content === 'OPEN' &&
+        element.className.includes('filter-option-open')
+      );
+    });
+    fireEvent.click(openButton);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
   });
  });
 
