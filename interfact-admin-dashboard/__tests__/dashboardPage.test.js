@@ -4,6 +4,7 @@ import React from 'react';
 import Home from '../src/app/dashboard/page.tsx';
 import { useIntersections } from '../src/app/hooks/useIntersections';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
+import { describe } from 'node:test';
 
 // Mock useRouter:
 const mockPush = jest.fn();
@@ -51,7 +52,7 @@ const filterIntersectionData = [
 ];
 
 
-describe('Home', () => {
+describe('Default dashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -132,33 +133,24 @@ describe('Home', () => {
     expect(problemsReportedText).toBeInTheDocument();
   });
   
+ });
 
-  it('clicking on the Map View button opens the correct URL', () => {
-    useIntersections.mockReturnValue([]);
-    useUserFeedback.mockReturnValue([]);
+function setUpForFilters() {
+  useIntersections.mockReturnValue(filterIntersectionData);
+  useUserFeedback.mockReturnValue([]);
+  render(<Home />);
+  // Open the filter options
+  const filterButton = screen.getByText(/Filter/);
+  fireEvent.click(filterButton);
+}
 
-    // Mock window.open
-    window.open = jest.fn();
-
-    render(<Home />);
-
-    const mapViewButton = screen.getByText('Map View');
-
-    fireEvent.click(mapViewButton);
-
-    expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
+describe("Dashboard filters", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-
   it('when Open filter is selected, only OPEN status intersections are displayed', () => {
-    useIntersections.mockReturnValue(filterIntersectionData);
-    useUserFeedback.mockReturnValue([]);
-
-    render(<Home />);
-
-    // Open the filter options
-    const filterButton = screen.getByText(/Filter/);
-    fireEvent.click(filterButton);
+    setUpForFilters();
 
     // Select OPEN filter using a custom matcher
     const openFilterOption = screen.getByText((content, element) => {
@@ -175,16 +167,8 @@ describe('Home', () => {
     expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
   });
 
-
   it('when Blocked filter is selected, only BLOCKED status intersections are displayed', () => {
-    useIntersections.mockReturnValue(filterIntersectionData);
-    useUserFeedback.mockReturnValue([]);
-
-    render(<Home />);
-
-    // Open the filter options
-    const filterButton = screen.getByText(/Filter/);
-    fireEvent.click(filterButton);
+    setUpForFilters();
 
     // Select BLOCKED filter
     const openFilterOption = screen.getByText((content, element) => {
@@ -201,16 +185,8 @@ describe('Home', () => {
     expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
   });
 
-
   it('when Maintenance filter is selected, only UNDER_MAINTENANCE status intersections are displayed', () => {
-    useIntersections.mockReturnValue(filterIntersectionData);
-    useUserFeedback.mockReturnValue([]);
-
-    render(<Home />);
-
-    // Open the filter options
-    const filterButton = screen.getByText(/Filter/);
-    fireEvent.click(filterButton);
+    setUpForFilters();
 
     // Select UNDER_MAINTENANCE filter
     const openFilterOption = screen.getByText((content, element) => {
@@ -226,6 +202,27 @@ describe('Home', () => {
     expect(screen.queryByText(filterIntersectionData[0].name)).not.toBeInTheDocument();
     expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
   });
+ });
+
+
+
+describe("Dashboard navigation", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  
+  it('clicking on the Map View button opens the correct URL', () => {
+    useIntersections.mockReturnValue([]);
+    useUserFeedback.mockReturnValue([]);
+
+    // Mock window.open
+    window.open = jest.fn();
+    render(<Home />);
+    const mapViewButton = screen.getByText('Map View');
+    fireEvent.click(mapViewButton);
+
+    expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
+  });
 
 
   it('clicking on the Add button navigates to /add_camera', () => {
@@ -233,23 +230,18 @@ describe('Home', () => {
     useUserFeedback.mockReturnValue([]);
   
     const { container } = render(<Home />);
-  
     // Select the Add button using class name
     const addButton = container.querySelector('.fa-plus');
-  
     expect(addButton).toBeInTheDocument();
-  
     fireEvent.click(addButton);
 
     expect(mockPush).toHaveBeenCalledWith('/add_camera');
   });  
 
-
   it('should navigate to the add camera page when "c" is pressed', () => {
     render(<Home />);
+    fireEvent.keyDown(document, {key: 'c'});
  
-     fireEvent.keyDown(document, {key: 'c'});
- 
-     expect(mockPush).toHaveBeenCalledWith('/add_camera');
+    expect(mockPush).toHaveBeenCalledWith('/add_camera');
    });
  });
