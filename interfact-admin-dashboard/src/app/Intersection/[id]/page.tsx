@@ -8,6 +8,8 @@ import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { db } from '../../../../FirebaseConfig';
 
 const IntersectionPage = () => {
 
@@ -52,19 +54,34 @@ const IntersectionPage = () => {
     const confirmReport = async (url: string) =>{
         try {
             const response = await fetch('/api/report', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url }),
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url }),
             });
       
             const data = await response.json();
             if (response.ok) {
-              console.log(data.message);
+                //Delete docs(reports) with the url
+                const usersRef = collection(db, 'users');
+                const snapshot = await getDocs(usersRef);
+
+                const deletions: Promise<void>[] = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (Array.isArray(data.reports)) {
+                      const hasMatch = data.reports.some(r => r.reporturl === url);
+                      if (hasMatch) {
+                        deletions.push(deleteDoc(docSnap.ref));
+                      }
+                    }
+                  });
+                  await Promise.all(deletions);
+                console.log(data.message);
             } else {
-              console.error(data.message);
+                console.error(data.message);
             }
           } catch (error) {
-            console.error('Request failed:', error);
+                console.error('Request failed:', error);
           }
     }
 

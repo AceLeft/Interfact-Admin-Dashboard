@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   try {
     const { url } = await request.json();
 
-    // Build absolute paths relative to your project root (process.cwd())
     const oldPath = path.join(process.cwd(), 'public', 'report-check', 'reported-images', url);
     const newPath = path.join(process.cwd(), 'public', 'report-check', 'confirmed-images', url);
 
