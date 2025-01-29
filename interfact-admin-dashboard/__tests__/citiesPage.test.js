@@ -43,4 +43,13 @@ describe('Muncie tab', () => {
     render(<Cities />);
     expect(screen.getByText('Intersections | 0')).toBeInTheDocument();
   });
+
+  it('navigates to dashboard', () => {
+    render(<Cities />);
+    const muncie = screen.getByText('Muncie');
+    expect(muncie).toBeInTheDocument();
+    fireEvent.click(muncie);
+
+    expect(mockPush).toHaveBeenCalledWith('/dashboard');
+  })
 });
