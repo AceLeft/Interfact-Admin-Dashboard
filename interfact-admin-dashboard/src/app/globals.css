@@ -283,13 +283,13 @@ body {
   cursor: pointer;
   scale: 1.04;
 }
-.filter-option-blocked, .filter-option-open{
+.filter-option-blocked, .filter-option-open, .filter-option-maintenance{
   padding: 5px 8px 5px 8px;
   border-radius: 25px;
   background-color: #1d2022;
   transition: all .1s;
 }
-.filter-option-open-selected, .filter-option-blocked-selected{
+.filter-option-open-selected, .filter-option-blocked-selected, .filter-option-maintenance-selected{
   padding: 5px 8px 5px 8px;
   border-radius: 25px;
   background-color: #4c504c;
