@@ -5,6 +5,7 @@ import { useUserFeedback } from '../src/app/hooks/useUserFeedback.ts';
 import { beforeEach } from 'node:test';
 import { useParams } from 'next/navigation.js';
 import { render, screen } from '@testing-library/react';
+import { expect } from '@jest/globals';
 
 jest.mock('next/navigation', () => ({
     useParams: jest.fn(),
@@ -46,8 +47,6 @@ describe('IntersectionPage', () => {
     })
 
     it('sets interesection ID when a valid ID is found in Intersections', () => {
-
-
         useParams.mockReturnValue({id: mockId});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue([]);
@@ -57,6 +56,16 @@ describe('IntersectionPage', () => {
         expect(
             screen.getByRole('heading', { name: /Elliot \(ELL1\)/ })
           ).toBeInTheDocument();
+    })
+
+    it('Shows an error when given no ID', () => {
+        useParams.mockReturnValue({id: []});
+        useIntersections.mockReturnValue(mockIntersections);
+        useUserFeedback.mockReturnValue([]);
+
+        render(<IntersectionsPage/>)
+        
+        expect(screen.getByText("No valid ID provided.")).toBeInTheDocument();
     })
 })
 
@@ -112,5 +121,16 @@ describe("Requests", () => {
         render(<IntersectionsPage/>)
         
         expect(screen.getAllByTestId("report").length).toBe(3);
+    })
+
+    it('displays no requests if none exist', () => {
+        useParams.mockReturnValue({id: "fakeIntersection"});
+        useIntersections.mockReturnValue(mockIntersections);
+        useUserFeedback.mockReturnValue(mockUserFeedback);
+
+        render(<IntersectionsPage/>)
+        
+        expect(screen.getByText("No reports found for this intersection.")).toBeInTheDocument();
+        expect(screen.queryByTestId("report")).not.toBeInTheDocument();
     })
 })
