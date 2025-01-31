@@ -1,0 +1,1 @@
+In order for this folder (which is required for confirmed reports to work) to be pushed, it needs a file in it.
