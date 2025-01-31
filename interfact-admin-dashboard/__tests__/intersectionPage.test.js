@@ -4,8 +4,9 @@ import { useIntersections } from '../src/app/hooks/useIntersections.ts';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback.ts';
 import { beforeEach } from 'node:test';
 import { useParams } from 'next/navigation.js';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { expect } from '@jest/globals';
+import { error } from 'console';
 
 jest.mock('next/navigation', () => ({
     useParams: jest.fn(),
@@ -18,6 +19,14 @@ jest.mock('../src/app/hooks/useUserFeedback.ts', () => ({
 jest.mock('../src/app/hooks/useIntersections.ts', () => ({
     useIntersections: jest.fn(),
 }))
+
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve({ test: 100 }),
+    }),
+)
+
+
 
 const mockId = 'ELL1'
 const mockIntersections = [
@@ -132,5 +141,18 @@ describe("Requests", () => {
         
         expect(screen.getByText("No reports found for this intersection.")).toBeInTheDocument();
         expect(screen.queryByTestId("report")).not.toBeInTheDocument();
+    })
+
+    it('calls fetch when approve is pressed', () => {
+        // This is as close to testing the db as I can get
+        useParams.mockReturnValue({id: mockId});
+        useIntersections.mockReturnValue(mockIntersections);
+        useUserFeedback.mockReturnValue(mockUserFeedback);
+
+        render(<IntersectionsPage/>);
+        const approveButton = screen.getAllByTestId("confirm")[0];
+        expect(approveButton).not.toBeNull();
+        fireEvent.click(approveButton);
+        expect(fetch).toHaveBeenCalled();
     })
 })

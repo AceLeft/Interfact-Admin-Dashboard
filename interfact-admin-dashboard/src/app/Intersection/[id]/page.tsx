@@ -117,7 +117,7 @@ const IntersectionPage = () => {
                                     <hr />
                                     <div className='report-buttons-text'>Accept or deny report:</div>
                                     <div className='report-buttons'>
-                                        <button className='report-positive' onClick={() => confirmReport(report.reporturl)}><FontAwesomeIcon icon={faThumbsUp}/></button>
+                                        <button className='report-positive' onClick={() => confirmReport(report.reporturl)} data-testid="confirm"><FontAwesomeIcon icon={faThumbsUp}/></button>
                                         <button className='report-negative'><FontAwesomeIcon icon={faThumbsDown}/></button>
                                     </div>
                                 </div>
