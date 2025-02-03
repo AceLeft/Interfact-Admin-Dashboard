@@ -108,7 +108,7 @@ const IntersectionPage = () => {
                     <h1>Reports Recieved <span>{reports?.length || "-"}</span></h1>
                     {reports && reports.length > 0 ? (
                     reports.map((report, index) => (
-                        <div key={`${report.reportid} ${index}`}>
+                        <div key={`${report.reportid} ${index}`} data-testid="report">
                             <div className='report-container'>
                                 <div className='report-item-1'>Image | <span>{report.reporturl}</span> 
                                     <br /> 
@@ -117,7 +117,7 @@ const IntersectionPage = () => {
                                     <hr />
                                     <div className='report-buttons-text'>Accept or deny report:</div>
                                     <div className='report-buttons'>
-                                        <button className='report-positive' onClick={() => confirmReport(report.reporturl)}><FontAwesomeIcon icon={faThumbsUp}/></button>
+                                        <button className='report-positive' onClick={() => confirmReport(report.reporturl)} data-testid="confirm"><FontAwesomeIcon icon={faThumbsUp}/></button>
                                         <button className='report-negative'><FontAwesomeIcon icon={faThumbsDown}/></button>
                                     </div>
                                 </div>
