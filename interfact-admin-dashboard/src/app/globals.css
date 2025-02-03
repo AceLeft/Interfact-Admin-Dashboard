@@ -357,10 +357,24 @@ body {
   color: #9c9c9c;
 }
 
+.name-reports-container{
+  display: flex;
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  gap: 5px;
+}
+
+.item-name{
+  background-color: white; 
+  padding: 2px 8px; 
+  border-radius: 50px; 
+  font-weight: bold;
+  font-family: 'outfit';
+  color: #1d2022;
+}
+
 .item-reports {
-  position: absolute; 
-  top: 5px; 
-  right: 5px;
   background-color: #fa4242; 
   padding: 2px 8px; 
   border-radius: 50px; 
@@ -368,6 +382,11 @@ body {
   font-family: 'outfit';
   color: #1d2022;
 }
+
+.no-item-reports{
+  display: hidden;
+}
+
 
 /* use for toggle between working/notworking/maintenace */
 .good-indicator{
@@ -393,18 +412,6 @@ body {
   height: 7px;
   border-radius: 15px;
 
-}
-
-.item-name{
-  position: absolute; 
-  top: 5px; 
-  left: 5px;
-  background-color: white; 
-  padding: 2px 8px; 
-  border-radius: 50px; 
-  font-weight: bold;
-  font-family: 'outfit';
-  color: #1d2022;
 }
 
 .intersection-add {

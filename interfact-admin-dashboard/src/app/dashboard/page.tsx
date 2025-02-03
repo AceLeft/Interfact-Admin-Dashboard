@@ -215,8 +215,10 @@ export default function Dashboard() {
                 <div key={item.id} className="intersection-item shadow" onClick={() => navToIntersectionPage(item.id)}>
                     <div className="item-img-container">
                         <img src={item.imagepath} alt={item.name} />
-                        <div className="item-reports">{getReportsForIntersection(item.id)}</div>
-                        <div className="item-name">{item.name}</div>
+                        <div className="name-reports-container">
+                            <div className="item-name">{item.name}</div>
+                            <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
+                        </div>
                     </div>
                 <div className="item-info-container">
                     <div className="item-last-update">
