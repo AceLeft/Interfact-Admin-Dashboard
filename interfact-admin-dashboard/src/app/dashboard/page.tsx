@@ -235,7 +235,7 @@ export default function Dashboard() {
                 </div>
                 <div
                     className={
-                        calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
+                        item.status === "MAINTENANCE" ? "maintenance-indicator" :calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
                     }
                 ></div>
         </div>
