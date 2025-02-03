@@ -897,3 +897,19 @@ body {
   color: #4c504c;
 }
 
+.maintenance-button{
+  display: flex;
+  position: absolute;
+  border-radius: 25px;
+  padding: 10px;
+  left: 5px;
+  bottom: 5px;
+  border: 3px black solid;
+  transition: all .1s;
+}
+
+.maintenance-button:hover{
+  padding: 14px;
+  cursor: pointer;
+  background-color: #d67309;
+}

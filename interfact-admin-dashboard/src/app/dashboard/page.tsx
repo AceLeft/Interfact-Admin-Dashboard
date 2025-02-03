@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useRouter } from 'next/navigation';
@@ -219,6 +220,7 @@ export default function Dashboard() {
                             <div className="item-name">{item.name}</div>
                             <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
                         </div>
+                        <button className="maintenance-button"><FontAwesomeIcon icon={faWrench}/></button>
                     </div>
                 <div className="item-info-container">
                     <div className="item-last-update">
