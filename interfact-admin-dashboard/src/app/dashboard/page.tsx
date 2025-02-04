@@ -10,13 +10,14 @@ import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
-
+import { useLogs } from '../hooks/useLogs'; 
 
 export default function Dashboard() {
 
     //------------------------------ Hooks -----------------------------
 
     // Hooks to get data or utilities
+    const { logs, loading, error } = useLogs();
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
     const router = useRouter();
@@ -39,22 +40,44 @@ export default function Dashboard() {
     // Total # of intersections
     const totalIntersections = intersections.length;
 
-    // Calculates total # of reports from user feedback 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
     }, 0);
 
-    // Gets # of reports for an intersection id
     const getReportsForIntersection = (intersectionId: string) => {
+        console.log("Checking reports for intersection ID:", intersectionId);
+        console.log("Logs data:", logs);
+        console.log("User Feedback data:", userFeedback);
+    
         return userFeedback.reduce((total, user) => {
-            if (user.reports) {
-                const matchingReports = user.reports.filter((report) => report.reportid === intersectionId);
-                return total + matchingReports.length;
-                }
-            return total;
-            }, 0);
-        };
-
+            if (!Array.isArray(user.reports) || user.reports.length === 0) {
+                console.log(`User ${user.id} has no reports`);
+                return total; 
+            }
+    
+            // Convert log IDs to strings to match user reports
+            const matchingReports = user.reports.filter(reportLogID => {
+                const matchingLog = logs.find(log => {
+                    const logIdMatch = String(log.logid) === String(reportLogID);
+                    const intersectionMatch = String(log.cameraid) === String(intersectionId);
+    
+                    if (logIdMatch && intersectionMatch) {
+                        console.log(`Matching log found: Log ID ${log.logid}, Camera ID ${log.cameraid}`);
+                    }
+    
+                    return logIdMatch && intersectionMatch;
+                });
+    
+                return !!matchingLog; // Keep only reports that match a valid log
+            });
+    
+            console.log(`User ${user.id} has ${matchingReports.length} reports for intersection ${intersectionId}`);
+    
+            return total + matchingReports.length;
+        }, 0);
+    };
+    
+    
     //------------------------------------------------------------------------------------------------
 
 
@@ -179,7 +202,7 @@ export default function Dashboard() {
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
                     <div className="dash-main-2">Total Intersections | <span>{totalIntersections}</span></div>
-                    <div className="dash-main-3">Problems Reported (Last 30 days) | <span>{getTotalReports}</span></div>
+                    <div className="dash-main-3">Problems Reported | <span>{getTotalReports}</span></div>
                 </div>
 
                 {/* Open map view BUTTON */}
@@ -220,7 +243,6 @@ export default function Dashboard() {
                             <div className="item-name">{item.name}</div>
                             <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
                         </div>
-                        <button className="maintenance-button"><FontAwesomeIcon icon={faWrench}/></button>
                     </div>
                 <div className="item-info-container">
                     <div className="item-last-update">
@@ -242,9 +264,9 @@ export default function Dashboard() {
     ))) : (<div></div>)}
 
     {/* Add camera item in list */ }
-                <div className='intersection-add shadow'>
+                {/* <div className='intersection-add shadow'>
                     <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div>
+                </div> */}
             </div>
         </div>
     );
