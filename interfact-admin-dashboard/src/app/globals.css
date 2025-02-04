@@ -624,15 +624,91 @@ body {
   border-radius: 50px;
 }
 
-.intersection-logs{
+.intersection-logs {
   display: flex;
-  flex: 4;
+  flex: 7;
   background-color: white;
   border-radius: 15px;
   margin-left: 28px;
-  font-family: 'outfit';
-
+  font-family: 'Outfit', sans-serif;
+  flex-direction: column;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 200px;
 }
+
+.intersection-logs h1 {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.intersection-logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px; 
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.intersection-logs-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.intersection-logs-list::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.log-entry {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: 0.1s;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.log-entry:hover {
+  background-color: #f1f1f1;
+  transform: scale(1.01);
+}
+
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.log-row:last-child {
+  border-bottom: none;
+}
+
+.log-label {
+  font-weight: bold;
+  color: #333;
+  min-width: 120px;
+}
+
+.log-value {
+  color: #555;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 5px;
+}
+
+
+
 
 .report-item-1{
   
@@ -645,6 +721,7 @@ body {
 .report-container{
   transition: all .1s;
   display: flex;
+  flex-direction: column;
   background-color: #1d2022;
   color: white;
   padding: 20px;
@@ -652,33 +729,37 @@ body {
   margin-left: 20px;
   margin-bottom: 20px;
   font-size: .8em;
-  width: 90%;
+  width: 86%;
 }
 .report-container:hover{
   scale: 1.02;
 }
-.report-image{
-  flex: 1;
+.report-img {
+  flex: 1; 
 }
 
-.report-image img{
-  display: flex;
-  width: 100%;
+.report-img img {
+  width: 300px;
   height: auto;
   border-radius: 10px;
   object-fit: cover;
 }
 
-.report-buttons{
-  margin-top: 30px;
-  margin-bottom: 20px;
+.report-buttons {
   display: flex;
   gap: 15px;
-  transition: all .1s;
+  flex: 1;
 }
 
 .report-buttons-text{
   margin-top: 30px;
+}
+
+.report-container2{
+  display: flex;
+  align-items: center; 
+  gap: 20px;
+  justify-content: space-between;
 }
 
 .report-positive{

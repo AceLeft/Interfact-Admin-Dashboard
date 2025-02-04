@@ -1,10 +1,10 @@
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../../../FirebaseConfig";
+import { dbFB } from "../../../../FirebaseConfig";
 import { UserFeedback } from "../../types/Firebase/userFeedbackFB";
 
 export const getUserFeedbackFB = (callback: (data: UserFeedback[]) => void) => {
 
-    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(dbFB, "users"), (snapshot) => {
         const data = snapshot.docs.map(doc => {
             const docData = doc.data();
 
