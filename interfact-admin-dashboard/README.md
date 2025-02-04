@@ -37,6 +37,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 #### Links for Documentation:
 
-• [User.md](https://github.com/iauker01/InterFact/blob/22511337dbbff5c93d14d67871ce92e8ea4defae/Documentation/Dashboard/User.md)
+• [User.md](https://github.com/iauker01/InterFact/blob/527f30e1ae02b6999833b59577d8234399c115a2/Documentation/Dashboard/User.md)
 • [Development.md](https://github.com/iauker01/InterFact/blob/a7e65bbc671da00b33bea3dcf2d32754bb0f099e/Documentation/Dashboard/Development.md)
 • [Deployment.md](https://github.com/iauker01/InterFact/blob/a7e65bbc671da00b33bea3dcf2d32754bb0f099e/Documentation/Dashboard/Deployment.md)
