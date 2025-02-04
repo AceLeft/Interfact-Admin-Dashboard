@@ -27,6 +27,9 @@ export default function Dashboard() {
     const [ isFilterOpen, setIsFilterOpen ] = useState<boolean | null>(false);
     const [ isFilterBlocked, setIsFilterBlocked ] = useState<boolean | null>(false);
     const [ isFilterMaintenance, setIsFilterMaintenance ] = useState<boolean | null>(false);
+    const [isFilterWorking, setIsFilterWorking] = useState<boolean | null>(false);
+    const [isFilterNotWorking, setIsFilterNotWorking] = useState<boolean | null>(false);
+
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
@@ -94,6 +97,8 @@ export default function Dashboard() {
         setIsFilterOpen(false)
         setIsFilterBlocked(false)
         setIsFilterMaintenance(false)
+        setIsFilterWorking(false)
+        setIsFilterNotWorking(false)
     };
 
     // Navigate to intersection page by the intersection id
@@ -166,6 +171,18 @@ export default function Dashboard() {
                 }
                 break;
 
+                case 'Operational':
+                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
+                    setIsFilterWorking(!isFilterWorking);
+                }
+                break;
+
+                case 'Inactive':
+                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
+                    setIsFilterNotWorking(!isFilterNotWorking);
+                }
+                break;
+
             default:
                 console.warn(`Unknown filter option: ${selectedOption}`);
                 break;
@@ -182,6 +199,20 @@ export default function Dashboard() {
         
         // Cameras under Maintenance
         if (isFilterMaintenance) return item.status === 'MAINTENANCE';
+
+        // Cameras that have been updated within 10 minutes
+        if (isFilterWorking){
+            if(calculateDifferenceInMinutes(item.timestamp) < 10){
+                return item.status === "OPERATIONAL"
+            }
+        } 
+
+        // Cameras that have not been updated within 10 minutes
+        if (isFilterNotWorking){
+            if(calculateDifferenceInMinutes(item.timestamp) > 10){
+                return item.status === "INACTIVE"
+            }
+        } 
         return true; // No filters applied
     });
 
@@ -224,11 +255,13 @@ export default function Dashboard() {
                 <div className='blocked-open'>
 
                 {/* Calls filterOptions() onClick, passes open or closed as string depending on the button that is pressed */ }
-
+                {/* Lines 286 & 292 for css sheet */ }
                 <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
                 <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
                 <div onClick={() => filterOptions("Maintenance")} className={isFilterMaintenance === false ? 'filter-option-maintenance': 'filter-option-maintenance-selected'}>UNDER MAINTENANCE</div>
-                
+                <div onClick={() => filterOptions("Working")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
+                <div onClick={() => filterOptions("Inactive")} className={isFilterNotWorking === false ? 'filter-option-inactive' : 'filter-option-inactive-selected'}>INACTIVE</div>
+
                 </div>
             </div>
 

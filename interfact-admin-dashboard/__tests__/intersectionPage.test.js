@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation.js';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect } from '@jest/globals';
 
+
 jest.mock('next/navigation', () => ({
     useParams: jest.fn(),
 }))
@@ -24,10 +25,6 @@ global.fetch = jest.fn(() =>
       json: () => Promise.resolve({ test: 100 }),
     }),
 )
-
-/* Because there's no real database, jest will complain
-    that console.error is undefined*/
-console.error = jest.fn();
 
 
 const mockId = 'ELL1'
