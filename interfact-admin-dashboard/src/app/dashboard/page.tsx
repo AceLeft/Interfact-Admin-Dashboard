@@ -33,6 +33,8 @@ export default function Dashboard() {
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
+    // Tab is hidden on default
+    const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
     //------------------------------------------------------------------
 
 
@@ -131,6 +133,8 @@ export default function Dashboard() {
             document.removeEventListener('keydown', handleKeyPress);
         };
     }, [router]);
+
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
 
     //------------------------------------------------------------------------------------------------
 
@@ -296,11 +300,30 @@ export default function Dashboard() {
         </div>
     ))) : (<div></div>)}
 
-    {/* Add camera item in list */ }
-                {/* <div className='intersection-add shadow'>
-                    <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div> */}
-            </div>
+    {/* Hidden Tab to show keyboard shortcuts */}
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+    <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
+        <div className="tab-content"> 
+            {isShortcutTabExpanded ? (
+                <div className="shortcut-list">
+                    <h3>Keyboard Shortcuts</h3>
+                        <ul>
+                            <li><strong> r :</strong> Add Camera Page </li>
+                        </ul>
+                    </div>
+            ) : (
+                <span>Keyboard Shortcuts</span>
+            )}
         </div>
+    </div>
+
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+
+            {/* Add camera item in list */ }
+                {/* <div className='intersection-add shadow'>
+                <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
+                </div> */}
+        </div>
+    </div>
     );
 }
