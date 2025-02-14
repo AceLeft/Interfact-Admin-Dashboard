@@ -121,7 +121,6 @@ export default function Dashboard() {
 
     // Popup
     
-    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
     // ------------------------- Keyboard shortcuts -------------------------
     
     useEffect(() => {
@@ -157,6 +156,8 @@ export default function Dashboard() {
             setPopupFlag(false);
         }}, []);
     // ---------------------------------------------------------------
+
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
 
     //------------------------------------------------------------------------------------------------
 
