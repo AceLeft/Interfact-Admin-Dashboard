@@ -233,7 +233,7 @@ export default function Dashboard() {
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
                     <div className="dash-main-2">Total Intersections | <span>{totalIntersections}</span></div>
-                    <div className="dash-main-3">Problems Reported | <span>{getTotalReports}</span></div>
+                    <div className="dash-main-3">Problems Reported | <span data-testid="reports-amount">{getTotalReports}</span></div>
                 </div>
 
                 {/* Open map view BUTTON */}

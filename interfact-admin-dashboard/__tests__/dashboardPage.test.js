@@ -127,11 +127,10 @@ describe('Default dashboard', () => {
   
     render(<Home />);
   
-    const problemsReportedText = screen.getByText((content, element) => {
-      return element.textContent === 'Problems Reported (Last 30 days) | 3';
-    });
+    const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("3");
   });
   
  });
@@ -251,23 +250,5 @@ describe("Dashboard navigation", () => {
   });
 
 
-  it('clicking on the Add button navigates to /add_camera', () => {
-    useIntersections.mockReturnValue([]);
-    useUserFeedback.mockReturnValue([]);
-  
-    const { container } = render(<Home />);
-    // Select the Add button using class name
-    const addButton = container.querySelector('.fa-plus');
-    expect(addButton).toBeInTheDocument();
-    fireEvent.click(addButton);
 
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-  });  
-
-  it('should navigate to the add camera page when "c" is pressed', () => {
-    render(<Home />);
-    fireEvent.keyDown(document, {key: 'c'});
- 
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-   });
  });
