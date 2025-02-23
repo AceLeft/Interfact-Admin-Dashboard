@@ -6,6 +6,7 @@ import { beforeEach } from 'node:test';
 import { useParams } from 'next/navigation.js';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect } from '@jest/globals';
+import { useLogs } from '../src/app/hooks/useLogs.ts';
 
 
 jest.mock('next/navigation', () => ({
@@ -20,9 +21,13 @@ jest.mock('../src/app/hooks/useIntersections.ts', () => ({
     useIntersections: jest.fn(),
 }))
 
+jest.mock('../src/app/hooks/useLogs.ts', () => ({
+    useLogs: jest.fn(),
+}))
+
 global.fetch = jest.fn(() =>
     Promise.resolve({
-      json: () => Promise.resolve({ test: 100 }),
+      json: () => Promise.resolve([]),
     }),
 )
 
@@ -52,6 +57,7 @@ const mockIntersections = [
 describe('IntersectionPage', () => {
     beforeEach(() =>{
         jest.clearAllMocks();
+        useLogs.mockReturnValue({logs: [], loading: false, error: null});
     })
 
     it('sets interesection ID when a valid ID is found in Intersections', () => {
