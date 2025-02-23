@@ -17,7 +17,7 @@ export default function Dashboard() {
     //------------------------------ Hooks -----------------------------
 
     // Hooks to get data or utilities
-    const { logs, loading, error } = useLogs();
+    const { logs } = useLogs();
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
     const router = useRouter();
@@ -48,9 +48,7 @@ export default function Dashboard() {
     }, 0);
 
     const getReportsForIntersection = (intersectionId: string) => {
-        console.log("Checking reports for intersection ID:", intersectionId);
-        console.log("Logs data:", logs);
-        console.log("User Feedback data:", userFeedback);
+
     
         return userFeedback.reduce((total, user) => {
             if (!Array.isArray(user.reports) || user.reports.length === 0) {
@@ -111,9 +109,6 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
       };
 
-    const goToAddCamera = () =>{
-        router.push("/add_camera")
-    }
 
     // Keyboard shortcuts
     useEffect(() => {
