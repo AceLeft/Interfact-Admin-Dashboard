@@ -134,6 +134,10 @@ export default function Dashboard() {
             if (event.key.toLowerCase() === 'r') {
                 router.push('/requests');
             }
+
+            if (event.key.toLowerCase() === 'r') {
+                router.push('/requests');
+            }
         };
         // EventListener is needed for keydown events
         document.addEventListener('keydown', handleKeyPress);
