@@ -1000,6 +1000,16 @@ body {
 
 /* For Collapsed Tab */
 /* Some elements might be unnecessary, used an online example as a guideline */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #000;
+}
 
 .keyboard-shortcut-tab {
   position: fixed;
