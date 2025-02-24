@@ -1,16 +1,22 @@
 'use client';
 // @ts-ignore
+//------------------------ FontAwesome ------------------------
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
+
+//--------------------------- Hooks ---------------------------
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
+import { useLogs } from '../hooks/useLogs'; 
+
+//-------------------------------------------------------------
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
-import { useLogs } from '../hooks/useLogs'; 
+
 
 export default function Dashboard() {
 
@@ -35,6 +41,8 @@ export default function Dashboard() {
 
     // Tab is hidden on default
     const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
+    // Flag that controls popup visibility
+    const [popupFlag, setPopupFlag] = useState(true);
     //------------------------------------------------------------------
 
 
@@ -117,7 +125,11 @@ export default function Dashboard() {
         router.push("/add_camera")
     }
 
-    // Keyboard shortcuts
+    // Popup
+    
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+    // ------------------------- Keyboard shortcuts -------------------------
+    
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             // If the c key is pressed
@@ -138,7 +150,19 @@ export default function Dashboard() {
         };
     }, [router]);
 
-    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+    // ---------------------------------------------------------------
+
+
+    // ------------------------- Popup Close -------------------------
+    useEffect(() => {
+        // Check localStorage if the popup has been closed before
+        const hasClosedPopup = localStorage.getItem('popupFlag');
+        
+        if (hasClosedPopup === 'false') {
+            // Popup wont show if flag is false
+            setPopupFlag(false);
+        }}, []);
+    // ---------------------------------------------------------------
 
     //------------------------------------------------------------------------------------------------
 
@@ -306,16 +330,26 @@ export default function Dashboard() {
 
     {/* Hidden Tab to show keyboard shortcuts */}
     {/*----------------------------------------------------------------------------------------------------------------*/}
+    {popupFlag &&(
     <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
         <div className="tab-content"> 
             {isShortcutTabExpanded ? (
                 <div className="shortcut-list">
+
                     {/* x button to close the tab */}
+                    {/*-----------------------------------------------------------------*/}
                     <button className="close-btn" onClick={(e) => {
-                        e.stopPropagation();  // Prevents closing when clicking on the close button
-                        setIsShortcutTabExpanded(false);  // Closes the popup
+                         e.stopPropagation();
+                         // Minimize Tab
+                         setIsShortcutTabExpanded(false);
+                         // localStorage saves value pairs in the browser. Is saved after browser close.
+                         // Store the flag in localStorage to show x has been clicked previously
+                         localStorage.setItem('popupFlag', 'false');
+                         // Update flag to hide popup
+                         setPopupFlag(false);
                     }}> X </button>
-                    
+                    {/*-----------------------------------------------------------------*/}
+
                     <h3>Keyboard Shortcuts</h3>
                         <ul>
                             <li><strong> A :</strong> Add Camera Page </li>
@@ -327,7 +361,7 @@ export default function Dashboard() {
             )}
         </div>
     </div>
-
+    )}
     {/*----------------------------------------------------------------------------------------------------------------*/}
 
             {/* Add camera item in list */ }
