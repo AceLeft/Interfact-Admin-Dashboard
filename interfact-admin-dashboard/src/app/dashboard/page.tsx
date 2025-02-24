@@ -33,6 +33,8 @@ export default function Dashboard() {
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
+    // Tab is hidden on default
+    const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
     //------------------------------------------------------------------
 
 
@@ -123,6 +125,10 @@ export default function Dashboard() {
                 // Redirect to add camera page
                 router.push('/add_camera');
             }
+
+            if (event.key.toLowerCase() === 'r') {
+                router.push('/requests');
+            }
         };
         // EventListener is needed for keydown events
         document.addEventListener('keydown', handleKeyPress);
@@ -131,6 +137,8 @@ export default function Dashboard() {
             document.removeEventListener('keydown', handleKeyPress);
         };
     }, [router]);
+
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
 
     //------------------------------------------------------------------------------------------------
 
@@ -296,11 +304,37 @@ export default function Dashboard() {
         </div>
     ))) : (<div></div>)}
 
-    {/* Add camera item in list */ }
-                {/* <div className='intersection-add shadow'>
-                    <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div> */}
-            </div>
+    {/* Hidden Tab to show keyboard shortcuts */}
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+    <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
+        <div className="tab-content"> 
+            {isShortcutTabExpanded ? (
+                <div className="shortcut-list">
+                    {/* x button to close the tab */}
+                    <button className="close-btn" onClick={(e) => {
+                        e.stopPropagation();  // Prevents closing when clicking on the close button
+                        setIsShortcutTabExpanded(false);  // Closes the popup
+                    }}> X </button>
+                    
+                    <h3>Keyboard Shortcuts</h3>
+                        <ul>
+                            <li><strong> A :</strong> Add Camera Page </li>
+                            <li><strong> R :</strong> Requests Page </li>
+                        </ul>
+                    </div>
+            ) : (
+                <span>Keyboard Shortcuts</span>
+            )}
         </div>
+    </div>
+
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+
+            {/* Add camera item in list */ }
+                {/* <div className='intersection-add shadow'>
+                <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
+                </div> */}
+        </div>
+    </div>
     );
 }
