@@ -6,10 +6,11 @@ import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
-
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useLogs } from '../hooks/useLogs'; 
+
+//-------------------------------------------------------------
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
@@ -117,10 +118,9 @@ export default function Dashboard() {
       };
 
 
-    // Keyboard shortcuts
-
     // Popup
     
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
     // ------------------------- Keyboard shortcuts -------------------------
     
     useEffect(() => {
@@ -161,7 +161,19 @@ export default function Dashboard() {
         }}, []);
     // ---------------------------------------------------------------
 
-    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+    // ---------------------------------------------------------------
+
+
+    // ------------------------- Popup Close -------------------------
+    useEffect(() => {
+        // Check localStorage if the popup has been closed before
+        const hasClosedPopup = localStorage.getItem('popupFlag');
+        
+        if (hasClosedPopup === 'false') {
+            // Popup wont show if flag is false
+            setPopupFlag(false);
+        }}, []);
+    // ---------------------------------------------------------------
 
     //------------------------------------------------------------------------------------------------
 
