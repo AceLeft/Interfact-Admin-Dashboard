@@ -288,6 +288,39 @@ describe("Dashboard navigation", () => {
   it('X button hides the popup & stores the flag in localStorage when clicked', () => {
     // Popup will be shown as local storage is cleared before each test
     render(<Home />);
+    fireEvent.keyDown(document, {key: 'c'});
+ 
+    expect(mockPush).toHaveBeenCalledWith('/add_camera');
+   });
+ });
+
+ // ------------------------------------- Popup Tests -------------------------------------
+ 
+ describe("Dashboard popup behavior", () => {
+
+  // -----------------------------------------
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // LocalStorage cleared before each test
+    localStorage.clear();
+  });
+  // -----------------------------------------
+
+  // ------------------------------------------------------------------
+  it('Popup is visable when popupFlag is not in localStorage', () => {
+    localStorage.clear();
+    render(<Home />);
+
+    // Test if the popup is visible by scanning the screen for popup text
+    const popup = screen.getByText('Keyboard Shortcuts');
+    expect(popup).toBeInTheDocument();
+  });
+  // ------------------------------------------------------------------
+
+  // ------------------------------------------------------------------------------------
+  it('X button hides the popup & stores the flag in localStorage when clicked', () => {
+    // Popup will be shown as local storage is cleared before each test
+    render(<Home />);
 
     // Test that the popup is visible
     const popup = screen.getByText('Keyboard Shortcuts');
@@ -303,15 +336,17 @@ describe("Dashboard navigation", () => {
     // Test that the flag is in localStorage (setPopupFlag = false / the popup is not set)
     expect(localStorage.getItem('popupFlag')).toBe('false');
   });
+  // ------------------------------------------------------------------------------------
 
+  // ------------------------------------------------------------------------------------
   it('Popup is not visable after the X button is clicked and page is reloaded', () => {
     // Popup is already saved in localStorage
     localStorage.setItem('popupFlag', 'false');
 
     render(<Home />);
+
+    // Test that the popup is not visable
     expect(screen.queryByText('Keyboard Shortcuts')).not.toBeInTheDocument();
   });
- 
+  // ------------------------------------------------------------------------------------
 });
-
-
