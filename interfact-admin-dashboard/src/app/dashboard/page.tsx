@@ -8,6 +8,8 @@ import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
+
+//-------------------------------------------------------------
 import { useLogs } from '../hooks/useLogs'; 
 
 //-------------------------------------------------------------
@@ -34,6 +36,7 @@ export default function Dashboard() {
     const [isFilterWorking, setIsFilterWorking] = useState<boolean | null>(false);
     const [isFilterNotWorking, setIsFilterNotWorking] = useState<boolean | null>(false);
 
+
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
@@ -41,6 +44,8 @@ export default function Dashboard() {
     const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
     // Flag that controls popup visibility
     const [popupFlag, setPopupFlag] = useState(true);
+    // Tab is hidden on default
+
     //------------------------------------------------------------------
 
 
