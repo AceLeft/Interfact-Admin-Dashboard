@@ -6,7 +6,6 @@ import { useIntersections } from '../src/app/hooks/useIntersections';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
 import { useLogs } from '../src/app/hooks/useLogs.ts';
-import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
 
 // Mock useRouter:
@@ -28,16 +27,6 @@ jest.mock('../src/app/hooks/useIntersections', () => ({
 jest.mock('../src/app/hooks/useUserFeedback', () => ({
   useUserFeedback: jest.fn(),
 }));
-
-jest.mock('../src/app/hooks/useLogs', () => ({
-  useLogs: jest.fn(),
-}));
-
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve([]),
-  }),
-)
 
 jest.mock('../src/app/hooks/useLogs', () => ({
   useLogs: jest.fn(),
@@ -78,7 +67,6 @@ const filterIntersectionData = [
 describe('Default dashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useLogs.mockReturnValue({logs: [], loading: false, error: null});
     useLogs.mockReturnValue({logs: [], loading: false, error: null});
   });
 
@@ -152,10 +140,8 @@ describe('Default dashboard', () => {
     render(<Home />);
   
     const problemsReportedText = screen.getByTestId("reports-amount");
-    const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
-    expect(problemsReportedText.textContent).toBe("3");
     expect(problemsReportedText.textContent).toBe("3");
   });
   
@@ -327,3 +313,5 @@ describe("Dashboard navigation", () => {
   });
  
 });
+
+

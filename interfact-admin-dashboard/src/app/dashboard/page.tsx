@@ -7,12 +7,9 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
 
-//--------------------------- Hooks ---------------------------
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useLogs } from '../hooks/useLogs'; 
-
-//-------------------------------------------------------------
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
@@ -119,6 +116,8 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
       };
 
+
+    // Keyboard shortcuts
 
     // Popup
     
