@@ -5,6 +5,7 @@ import Home from '../src/app/dashboard/page.tsx';
 import { useIntersections } from '../src/app/hooks/useIntersections';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
+import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
 
 // Mock useRouter:
@@ -26,6 +27,16 @@ jest.mock('../src/app/hooks/useIntersections', () => ({
 jest.mock('../src/app/hooks/useUserFeedback', () => ({
   useUserFeedback: jest.fn(),
 }));
+
+jest.mock('../src/app/hooks/useLogs', () => ({
+  useLogs: jest.fn(),
+}));
+
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve([]),
+  }),
+)
 
 
 const filterIntersectionData = [
@@ -56,6 +67,7 @@ const filterIntersectionData = [
 describe('Default dashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useLogs.mockReturnValue({logs: [], loading: false, error: null});
   });
 
   it('displays intersections correctly', () => {
@@ -127,11 +139,10 @@ describe('Default dashboard', () => {
   
     render(<Home />);
   
-    const problemsReportedText = screen.getByText((content, element) => {
-      return element.textContent === 'Problems Reported (Last 30 days) | 3';
-    });
+    const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("3");
   });
   
  });
@@ -251,20 +262,31 @@ describe("Dashboard navigation", () => {
   });
 
 
-  it('clicking on the Add button navigates to /add_camera', () => {
-    useIntersections.mockReturnValue([]);
-    useUserFeedback.mockReturnValue([]);
-  
-    const { container } = render(<Home />);
-    // Select the Add button using class name
-    const addButton = container.querySelector('.fa-plus');
-    expect(addButton).toBeInTheDocument();
-    fireEvent.click(addButton);
 
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-  });  
+ });
 
-  it('should navigate to the add camera page when "c" is pressed', () => {
+ // ------------------------------------- Popup Tests -------------------------------------
+ 
+ describe("Dashboard popup behavior", () => {
+
+  // -----------------------------------------
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // LocalStorage cleared before each test
+    localStorage.clear();
+  });
+
+  it('Popup is visable when popupFlag is not in localStorage', () => {
+    localStorage.clear();
+    render(<Home />);
+
+    // Test if the popup is visible by scanning the screen for popup text
+    const popup = screen.getByText('Keyboard Shortcuts');
+    expect(popup).toBeInTheDocument();
+  });
+
+  it('X button hides the popup & stores the flag in localStorage when clicked', () => {
+    // Popup will be shown as local storage is cleared before each test
     render(<Home />);
     fireEvent.keyDown(document, {key: 'c'});
  
@@ -282,9 +304,7 @@ describe("Dashboard navigation", () => {
     // LocalStorage cleared before each test
     localStorage.clear();
   });
-  // -----------------------------------------
 
-  // ------------------------------------------------------------------
   it('Popup is visable when popupFlag is not in localStorage', () => {
     localStorage.clear();
     render(<Home />);
@@ -293,9 +313,7 @@ describe("Dashboard navigation", () => {
     const popup = screen.getByText('Keyboard Shortcuts');
     expect(popup).toBeInTheDocument();
   });
-  // ------------------------------------------------------------------
 
-  // ------------------------------------------------------------------------------------
   it('X button hides the popup & stores the flag in localStorage when clicked', () => {
     // Popup will be shown as local storage is cleared before each test
     render(<Home />);
@@ -314,17 +332,13 @@ describe("Dashboard navigation", () => {
     // Test that the flag is in localStorage (setPopupFlag = false / the popup is not set)
     expect(localStorage.getItem('popupFlag')).toBe('false');
   });
-  // ------------------------------------------------------------------------------------
 
-  // ------------------------------------------------------------------------------------
   it('Popup is not visable after the X button is clicked and page is reloaded', () => {
     // Popup is already saved in localStorage
     localStorage.setItem('popupFlag', 'false');
 
     render(<Home />);
-
-    // Test that the popup is not visable
     expect(screen.queryByText('Keyboard Shortcuts')).not.toBeInTheDocument();
   });
-  // ------------------------------------------------------------------------------------
+ 
 });

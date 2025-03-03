@@ -58,13 +58,9 @@ export default function Dashboard() {
     }, 0);
 
     const getReportsForIntersection = (intersectionId: string) => {
-        console.log("Checking reports for intersection ID:", intersectionId);
-        console.log("Logs data:", logs);
-        console.log("User Feedback data:", userFeedback);
     
         return userFeedback.reduce((total, user) => {
             if (!Array.isArray(user.reports) || user.reports.length === 0) {
-                console.log(`User ${user.id} has no reports`);
                 return total; 
             }
     
@@ -83,9 +79,7 @@ export default function Dashboard() {
     
                 return !!matchingLog; // Keep only reports that match a valid log
             });
-    
-            console.log(`User ${user.id} has ${matchingReports.length} reports for intersection ${intersectionId}`);
-    
+        
             return total + matchingReports.length;
         }, 0);
     };
