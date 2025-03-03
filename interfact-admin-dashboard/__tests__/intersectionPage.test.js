@@ -57,7 +57,6 @@ const mockId = mockIntersections[0].id;
 describe('IntersectionPage', () => {
     beforeEach(() =>{
         jest.clearAllMocks();
-        useLogs.mockReturnValue({logs: [], loading: false, error: null});
     })
 
     it('sets interesection ID when a valid ID is found in Intersections', () => {
