@@ -1,18 +1,20 @@
-// 'use client';
-// import { useEffect, useState } from "react";
-// import { useUserFeedback } from '@/app/hooks/useUserFeedback';
+'use client';
+import { useEffect, useState } from "react";
+import { useParams } from 'next/navigation';
+import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 
 
 export default function requests() {
 
     // const userFeedback = useUserFeedback();
-    // const [reports, setReports] = useState<Report[] | null>([]);
+    // const params = useParams();
+    // const [requests, setRequests] = useState<string[] | null>([]);
     // const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
     // const getRequests = (id: string): Request[] => {
     //     return userFeedback.flatMap((user) => {
     //       if (user.requests) {
-    //         return user.reports.filter((report) => report.reportid === id);
+    //         return user.requests.filter((request) => request.reportid === id);
     //       }
     //       return [];
     //     });
@@ -20,8 +22,8 @@ export default function requests() {
 
     // useEffect(() => {
     // if (userFeedback.length > 0 && id) {
-    //     const fetchedReports = getReports(id);
-    //     setReports(fetchedReports);
+    //     const fetchedRequests = getRequests(id);
+    //     setRequests(fetchedRequests);
     // }
     // }, [userFeedback, id]);
 

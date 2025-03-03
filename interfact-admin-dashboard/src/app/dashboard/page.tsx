@@ -1,12 +1,18 @@
 'use client';
 // @ts-ignore
+//------------------------ FontAwesome ------------------------
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
+
+//--------------------------- Hooks ---------------------------
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
+import { useLogs } from '../hooks/useLogs'; 
+
+//-------------------------------------------------------------
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
@@ -17,6 +23,7 @@ export default function Dashboard() {
     //------------------------------ Hooks -----------------------------
 
     // Hooks to get data or utilities
+    const { logs } = useLogs();
     const intersections = useIntersections();
     const userFeedback = useUserFeedback();
     const router = useRouter();
@@ -26,9 +33,16 @@ export default function Dashboard() {
     const [ isFilterOpen, setIsFilterOpen ] = useState<boolean | null>(false);
     const [ isFilterBlocked, setIsFilterBlocked ] = useState<boolean | null>(false);
     const [ isFilterMaintenance, setIsFilterMaintenance ] = useState<boolean | null>(false);
+    const [isFilterWorking, setIsFilterWorking] = useState<boolean | null>(false);
+    const [isFilterNotWorking, setIsFilterNotWorking] = useState<boolean | null>(false);
+
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
+    // Tab is hidden on default
+    const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
+    // Flag that controls popup visibility
+    const [popupFlag, setPopupFlag] = useState(true);
     //------------------------------------------------------------------
 
 
@@ -39,22 +53,42 @@ export default function Dashboard() {
     // Total # of intersections
     const totalIntersections = intersections.length;
 
-    // Calculates total # of reports from user feedback 
     const getTotalReports = userFeedback.reduce((total, user) => {
         return total + (user.reports ? user.reports.length : 0);
     }, 0);
 
-    // Gets # of reports for an intersection id
     const getReportsForIntersection = (intersectionId: string) => {
-        return userFeedback.reduce((total, user) => {
-            if (user.reports) {
-                const matchingReports = user.reports.filter((report) => report.reportid === intersectionId);
-                return total + matchingReports.length;
-                }
-            return total;
-            }, 0);
-        };
 
+    
+        return userFeedback.reduce((total, user) => {
+            if (!Array.isArray(user.reports) || user.reports.length === 0) {
+                console.log(`User ${user.id} has no reports`);
+                return total; 
+            }
+    
+            // Convert log IDs to strings to match user reports
+            const matchingReports = user.reports.filter(reportLogID => {
+                const matchingLog = logs.find(log => {
+                    const logIdMatch = String(log.logid) === String(reportLogID);
+                    const intersectionMatch = String(log.cameraid) === String(intersectionId);
+    
+                    if (logIdMatch && intersectionMatch) {
+                        console.log(`Matching log found: Log ID ${log.logid}, Camera ID ${log.cameraid}`);
+                    }
+    
+                    return logIdMatch && intersectionMatch;
+                });
+    
+                return !!matchingLog; // Keep only reports that match a valid log
+            });
+    
+            console.log(`User ${user.id} has ${matchingReports.length} reports for intersection ${intersectionId}`);
+    
+            return total + matchingReports.length;
+        }, 0);
+    };
+    
+    
     //------------------------------------------------------------------------------------------------
 
 
@@ -71,6 +105,8 @@ export default function Dashboard() {
         setIsFilterOpen(false)
         setIsFilterBlocked(false)
         setIsFilterMaintenance(false)
+        setIsFilterWorking(false)
+        setIsFilterNotWorking(false)
     };
 
     // Navigate to intersection page by the intersection id
@@ -83,17 +119,22 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
       };
 
-    const goToAddCamera = () =>{
-        router.push("/add_camera")
-    }
 
-    // Keyboard shortcuts
+    // Popup
+    
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+    // ------------------------- Keyboard shortcuts -------------------------
+    
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             // If the c key is pressed
             if (event.key.toLowerCase() === 'c') {
                 // Redirect to add camera page
                 router.push('/add_camera');
+            }
+
+            if (event.key.toLowerCase() === 'r') {
+                router.push('/requests');
             }
         };
         // EventListener is needed for keydown events
@@ -103,6 +144,20 @@ export default function Dashboard() {
             document.removeEventListener('keydown', handleKeyPress);
         };
     }, [router]);
+
+    // ---------------------------------------------------------------
+
+
+    // ------------------------- Popup Close -------------------------
+    useEffect(() => {
+        // Check localStorage if the popup has been closed before
+        const hasClosedPopup = localStorage.getItem('popupFlag');
+        
+        if (hasClosedPopup === 'false') {
+            // Popup wont show if flag is false
+            setPopupFlag(false);
+        }}, []);
+    // ---------------------------------------------------------------
 
     //------------------------------------------------------------------------------------------------
 
@@ -143,6 +198,18 @@ export default function Dashboard() {
                 }
                 break;
 
+                case 'Operational':
+                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
+                    setIsFilterWorking(!isFilterWorking);
+                }
+                break;
+
+                case 'Inactive':
+                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
+                    setIsFilterNotWorking(!isFilterNotWorking);
+                }
+                break;
+
             default:
                 console.warn(`Unknown filter option: ${selectedOption}`);
                 break;
@@ -159,6 +226,20 @@ export default function Dashboard() {
         
         // Cameras under Maintenance
         if (isFilterMaintenance) return item.status === 'MAINTENANCE';
+
+        // Cameras that have been updated within 10 minutes
+        if (isFilterWorking){
+            if(calculateDifferenceInMinutes(item.timestamp) < 10){
+                return item.status === "OPERATIONAL"
+            }
+        } 
+
+        // Cameras that have not been updated within 10 minutes
+        if (isFilterNotWorking){
+            if(calculateDifferenceInMinutes(item.timestamp) > 10){
+                return item.status === "INACTIVE"
+            }
+        } 
         return true; // No filters applied
     });
 
@@ -179,7 +260,7 @@ export default function Dashboard() {
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
                     <div className="dash-main-2">Total Intersections | <span>{totalIntersections}</span></div>
-                    <div className="dash-main-3">Problems Reported (Last 30 days) | <span>{getTotalReports}</span></div>
+                    <div className="dash-main-3">Problems Reported | <span data-testid="reports-amount">{getTotalReports}</span></div>
                 </div>
 
                 {/* Open map view BUTTON */}
@@ -201,11 +282,13 @@ export default function Dashboard() {
                 <div className='blocked-open'>
 
                 {/* Calls filterOptions() onClick, passes open or closed as string depending on the button that is pressed */ }
-
+                {/* Lines 286 & 292 for css sheet */ }
                 <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
                 <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
                 <div onClick={() => filterOptions("Maintenance")} className={isFilterMaintenance === false ? 'filter-option-maintenance': 'filter-option-maintenance-selected'}>UNDER MAINTENANCE</div>
-                
+                <div onClick={() => filterOptions("Working")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
+                <div onClick={() => filterOptions("Inactive")} className={isFilterNotWorking === false ? 'filter-option-inactive' : 'filter-option-inactive-selected'}>INACTIVE</div>
+
                 </div>
             </div>
 
@@ -220,7 +303,6 @@ export default function Dashboard() {
                             <div className="item-name">{item.name}</div>
                             <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
                         </div>
-                        <button className="maintenance-button"><FontAwesomeIcon icon={faWrench}/></button>
                     </div>
                 <div className="item-info-container">
                     <div className="item-last-update">
@@ -241,11 +323,47 @@ export default function Dashboard() {
         </div>
     ))) : (<div></div>)}
 
-    {/* Add camera item in list */ }
-                <div className='intersection-add shadow'>
-                    <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div>
-            </div>
+    {/* Hidden Tab to show keyboard shortcuts */}
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+    {popupFlag &&(
+    <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
+        <div className="tab-content"> 
+            {isShortcutTabExpanded ? (
+                <div className="shortcut-list">
+
+                    {/* x button to close the tab */}
+                    {/*-----------------------------------------------------------------*/}
+                    <button className="close-btn" onClick={(e) => {
+                         e.stopPropagation();
+                         // Minimize Tab
+                         setIsShortcutTabExpanded(false);
+                         // localStorage saves value pairs in the browser. Is saved after browser close.
+                         // Store the flag in localStorage to show x has been clicked previously
+                         localStorage.setItem('popupFlag', 'false');
+                         // Update flag to hide popup
+                         setPopupFlag(false);
+                    }}> X </button>
+                    {/*-----------------------------------------------------------------*/}
+
+                    <h3>Keyboard Shortcuts</h3>
+                        <ul>
+                            <li><strong> A :</strong> Add Camera Page </li>
+                            <li><strong> R :</strong> Requests Page </li>
+                        </ul>
+                    </div>
+            ) : (
+                <span>Keyboard Shortcuts</span>
+            )}
         </div>
+    </div>
+    )}
+    {/*----------------------------------------------------------------------------------------------------------------*/}
+
+            {/* Add camera item in list */ }
+                {/* <div className='intersection-add shadow'>
+                <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
+                </div> */}
+        </div>
+    </div>
     );
 }
