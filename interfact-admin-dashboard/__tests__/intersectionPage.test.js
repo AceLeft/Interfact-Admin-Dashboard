@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation.js';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect } from '@jest/globals';
 import { useLogs } from '../src/app/hooks/useLogs.ts';
-import { mockLogs, usedLogIds } from '../__mocks__/mockLog.js';
+import { mockLogs, usedLogIds } from '../__mocks__/mockLog.ts';
 
 
 jest.mock('next/navigation', () => ({
