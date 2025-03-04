@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation.js';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect } from '@jest/globals';
 import { useLogs } from '../src/app/hooks/useLogs.ts';
+import { mockLogs, usedLogIds } from '../__mocks__/mockLog.js';
 
 
 jest.mock('next/navigation', () => ({
@@ -91,16 +92,8 @@ const mockUserFeedback = [
         id: "John Doe",
         // An array of reports
         reports: [
-            {
-                classification: "OPEN",
-                reportid: mockId,
-                reporturl: ""
-            },
-            {
-                classification: "CLOSED",
-                reportid: "JAM3",
-                reporturl: ""
-            },  
+            {logid: usedLogIds[0]},
+            {logid: usedLogIds[3]},  
         ],
         requests: []
     },
@@ -108,43 +101,32 @@ const mockUserFeedback = [
     {
         id: "Sam Samuel",
         reports: [
-            {
-                classification: "OPEN",
-                reportid: "LOG5",
-                reporturl: ""
-            },
-            {
-                classification: "CLOSED",
-                reportid: mockId,
-                reporturl: ""
-            }, 
-            {
-                classification: "CLOSED",
-                reportid: mockId,
-                reporturl: ""
-            },  
+            {logid: usedLogIds[2]},
+            {logid: usedLogIds[0]},
+            {logid: usedLogIds[5]},
         ],
         requests: []
     }
 ]
 
-describe("Requests", () => {
-    it('displays only requests for the correct intersection', () => {
+
+describe("Reports", () => {
+    it('displays only reports for the correct intersection', () => {
         useParams.mockReturnValue({id: mockId});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue(mockUserFeedback);
-        useLogs.mockReturnValue({logs: [], loading: false, error: null});
+        useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
 
         render(<IntersectionsPage/>)
         
         expect(screen.getAllByTestId("report").length).toBe(3);
     })
 
-    it('displays no requests if none exist', () => {
+    it('displays no reports if none exist', () => {
         useParams.mockReturnValue({id: "fakeIntersection"});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue(mockUserFeedback);
-        useLogs.mockReturnValue({logs: [], loading: false, error: null});
+        useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
 
         render(<IntersectionsPage/>)
         
@@ -157,7 +139,7 @@ describe("Requests", () => {
         useParams.mockReturnValue({id: mockId});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue(mockUserFeedback);
-        useLogs.mockReturnValue({logs: [], loading: false, error: null});
+        useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
 
         render(<IntersectionsPage/>);
         const approveButton = screen.getAllByTestId("confirm")[0];
