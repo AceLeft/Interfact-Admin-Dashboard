@@ -44,7 +44,10 @@ const IntersectionPage = () => {
             if (Array.isArray(user.reports)) {
                 return user.reports.filter((reportLog) => {
                     // Only get reports for THIS intersection
-                    const logItem = logs.find(log => String(log.logid).trim() === String(reportLog.logID).trim());
+                    const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
+                    console.log("GETREPORTS LOG ID:" + logItem?.cameraid);
+                    console.log("REPORTLOGID: "+ reportLog);
+                    console.log('ID:'+ id);
                     return logItem?.cameraid === id
             });
             }
@@ -167,8 +170,8 @@ const IntersectionPage = () => {
                 <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
                 {reports && reports.length > 0 ? (
                     reports.map((report, index) => {
-                        const logItem = logs.find(log => String(log.logid).trim() === String(report.logID).trim()); 
-                        
+                        const logItem = logs.find(log => String(log.logid).trim() === String(report).trim()); 
+                        console.log("LOGITEM" + logItem);
                         return (
                             <div key={`${report.logID}-${index}`} data-testid="report">
                                 {logItem ? (
