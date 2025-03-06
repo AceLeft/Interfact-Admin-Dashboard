@@ -131,12 +131,35 @@ describe('Default dashboard', () => {
   it('displays the total number of problems reported in the last 30 days', () => {
     useIntersections.mockReturnValue([]);
     const userFeedbackData = [
-      { reports: [{ reportid: '1' }, { reportid: '2' }] },
-      { reports: [{ reportid: '3' }] },
+      { reports: [{ logid: '1' }, { logid: '2' }] },
+      { reports: [{ logid: '3' }] },
       { reports: [] },
     ];
+    const logdata = [
+      {
+        logid: '1',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '2',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '3',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '4',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+    ]
     useUserFeedback.mockReturnValue(userFeedbackData);
-  
+    useLogs.mockReturnValue(logdata);
+    
     render(<Home />);
   
     const problemsReportedText = screen.getByTestId("reports-amount");

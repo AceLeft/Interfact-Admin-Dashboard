@@ -13,7 +13,22 @@ export const useLogs = () => {
                 const data = await response.json();
                 
                 if (response.ok) {
-                    setLogs(data);
+                    // Convert the data into a Log object
+                    console.log("DATA IS: " + JSON.stringify(data));
+                    let dataAsLog = data.map( (dataobj: 
+                        // Structure of mysql
+                        { id: number, logid: number; cameraid: string; timestamp: string; 
+                            filename: string; status: string; path: string }) => {
+                        return {
+                            logid: String(dataobj.logid),
+                            cameraid: dataobj.cameraid,
+                            timestamp: dataobj.timestamp,
+                            filename: dataobj.filename,
+                            status: dataobj.status,
+                            path: dataobj.path
+                        } as Log
+                    })
+                    setLogs(dataAsLog);
                 } else {
                     setError(data.error || "Failed to fetch logs");
                 }
