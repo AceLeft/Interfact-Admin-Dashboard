@@ -284,23 +284,18 @@ describe("Dashboard navigation", () => {
     expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
   });
 
-
-
  });
 
- // ------------------------------------- Popup Tests -------------------------------------
  
- describe("Dashboard popup behavior", () => {
-
-  // -----------------------------------------
+ 
+describe("Dashboard popup behavior", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // LocalStorage cleared before each test
     localStorage.clear();
   });
 
-  it('Popup is visable when popupFlag is not in localStorage', () => {
-    localStorage.clear();
+  it('Popup is visible when popupFlag is not in localStorage', () => {
     render(<Home />);
 
     // Test if the popup is visible by scanning the screen for popup text
@@ -308,42 +303,23 @@ describe("Dashboard navigation", () => {
     expect(popup).toBeInTheDocument();
   });
 
-  it('X button hides the popup & stores the flag in localStorage when clicked', () => {
-    // Popup will be shown as local storage is cleared before each test
-    render(<Home />);
-    fireEvent.keyDown(document, {key: 'c'});
- 
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-   });
- });
-
- // ------------------------------------- Popup Tests -------------------------------------
- 
- describe("Dashboard popup behavior", () => {
-
-  // -----------------------------------------
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // LocalStorage cleared before each test
-    localStorage.clear();
-  });
-
-  it('Popup is visable when popupFlag is not in localStorage', () => {
-    localStorage.clear();
+  it('shows the shortcuts when the popup is clicked', () => {
     render(<Home />);
 
-    // Test if the popup is visible by scanning the screen for popup text
     const popup = screen.getByText('Keyboard Shortcuts');
     expect(popup).toBeInTheDocument();
-  });
+    fireEvent.click(popup);
+
+    const shortcuts = screen.getByTestId("shortcuts-list");
+    expect(shortcuts).toBeInTheDocument();
+  })
 
   it('X button hides the popup & stores the flag in localStorage when clicked', () => {
-    // Popup will be shown as local storage is cleared before each test
     render(<Home />);
 
-    // Test that the popup is visible
     const popup = screen.getByText('Keyboard Shortcuts');
     expect(popup).toBeInTheDocument();
+    fireEvent.click(popup);
 
     // Click the X button to close the popup
     const closeButton = screen.getByText('X');
