@@ -11,8 +11,7 @@ import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { collection, query, where, getDocs, deleteDoc, updateDoc} from 'firebase/firestore';
 import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
-import { Log } from '@/app/types/Firebase/LogMySql';
-import { debug } from 'console';
+
 
 const IntersectionPage = () => {
 
@@ -20,7 +19,7 @@ const IntersectionPage = () => {
     const intersections = useIntersections();
     const { logs, loading, error } = useLogs();
     const params = useParams();
-    const [reports, setReports] = useState<Report[] | null>([]);
+    const [reports, setReports] = useState<string[] | null>([]);
 
     const [intersection, setIntersection] = useState<Intersection | null>(null);
 
@@ -39,15 +38,13 @@ const IntersectionPage = () => {
     return <div>No valid ID provided.</div>;
     }
 
-    const getReports = (): Report[] => {
+    const getReports = (): string[] => {
         return userFeedback.flatMap(user => {
             if (Array.isArray(user.reports)) {
-                return user.reports.filter((reportLog) => {
+                return user.reports.filter((reportLog : string) => {
                     // Only get reports for THIS intersection
+                    
                     const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
-                    console.log("GETREPORTS LOG ID:" + logItem?.cameraid);
-                    console.log("REPORTLOGID: "+ reportLog);
-                    console.log('ID:'+ id);
                     return logItem?.cameraid === id
             });
             }
@@ -75,7 +72,7 @@ const IntersectionPage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ logid: logID, status: newStatus }), 
             });
-    
+            
             const updateStatusData = await updateStatusResponse.json();
     
             if (updateStatusResponse.ok) {
@@ -169,11 +166,11 @@ const IntersectionPage = () => {
                 <div className='intersection-reports shadow'>
                 <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
                 {reports && reports.length > 0 ? (
-                    reports.map((report, index) => {
+                    reports.map((report : string, index) => {
+
                         const logItem = logs.find(log => String(log.logid).trim() === String(report).trim()); 
-                        console.log("LOGITEM" + logItem);
                         return (
-                            <div key={`${report.logID}-${index}`} data-testid="report">
+                            <div key={`${report}-${index}`} data-testid="report">
                                 {logItem ? (
                                 <div className='report-container'>
                                      

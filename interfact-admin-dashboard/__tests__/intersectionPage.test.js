@@ -92,8 +92,8 @@ const mockUserFeedback = [
         id: "John Doe",
         // An array of reports
         reports: [
-            {logid: usedLogIds[0]},
-            {logid: usedLogIds[3]},  
+            usedLogIds[0],
+            usedLogIds[3],  
         ],
         requests: []
     },
@@ -101,9 +101,9 @@ const mockUserFeedback = [
     {
         id: "Sam Samuel",
         reports: [
-            {logid: usedLogIds[2]},
-            {logid: usedLogIds[0]},
-            {logid: usedLogIds[5]},
+            usedLogIds[2],
+            usedLogIds[0],
+            usedLogIds[5],
         ],
         requests: []
     }
@@ -112,14 +112,14 @@ const mockUserFeedback = [
 
 describe("Reports", () => {
     it('displays only reports for the correct intersection', () => {
-        useParams.mockReturnValue({id: mockId});
+        useParams.mockReturnValue({id: "TEST2"});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue(mockUserFeedback);
         useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
 
         render(<IntersectionsPage/>)
         
-        expect(screen.getAllByTestId("report").length).toBe(3);
+        expect(screen.getAllByTestId("report").length).toBe(1);
     })
 
     it('displays no reports if none exist', () => {
@@ -136,12 +136,13 @@ describe("Reports", () => {
 
     it('calls fetch when approve is pressed', () => {
         // This is as close to testing the db as I can get
-        useParams.mockReturnValue({id: mockId});
+        useParams.mockReturnValue({id: "TEST2"});
         useIntersections.mockReturnValue(mockIntersections);
         useUserFeedback.mockReturnValue(mockUserFeedback);
         useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
 
         render(<IntersectionsPage/>);
+
         const approveButton = screen.getAllByTestId("confirm")[0];
         expect(approveButton).not.toBeNull();
         fireEvent.click(approveButton);
