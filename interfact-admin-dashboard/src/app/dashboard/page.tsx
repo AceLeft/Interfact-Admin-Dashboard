@@ -1,18 +1,10 @@
 'use client';
-// @ts-ignore
-//------------------------ FontAwesome ------------------------
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
-import { faWrench } from '@fortawesome/free-solid-svg-icons';
-
-//--------------------------- Hooks ---------------------------
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useLogs } from '../hooks/useLogs'; 
-
-//-------------------------------------------------------------
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
@@ -43,7 +35,6 @@ export default function Dashboard() {
     const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
     // Flag that controls popup visibility
     const [popupFlag, setPopupFlag] = useState(true);
-    //------------------------------------------------------------------
 
 
 
@@ -83,9 +74,7 @@ export default function Dashboard() {
             return total + matchingReports.length;
         }, 0);
     };
-    
-    
-    //------------------------------------------------------------------------------------------------
+
 
 
 
@@ -115,22 +104,12 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
       };
 
-    const goToAddCamera = () =>{
-        router.push("/add_camera")
-    }
-
-    // Popup
     
     const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
     // ------------------------- Keyboard shortcuts -------------------------
     
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            // If the c key is pressed
-            if (event.key.toLowerCase() === 'c') {
-                // Redirect to add camera page
-                router.push('/add_camera');
-            }
 
             if (event.key.toLowerCase() === 'r') {
                 router.push('/requests');
@@ -144,8 +123,6 @@ export default function Dashboard() {
         };
     }, [router]);
 
-    // ---------------------------------------------------------------
-
 
     // ------------------------- Popup Close -------------------------
     useEffect(() => {
@@ -156,10 +133,6 @@ export default function Dashboard() {
             // Popup wont show if flag is false
             setPopupFlag(false);
         }}, []);
-    // ---------------------------------------------------------------
-
-    //------------------------------------------------------------------------------------------------
-
 
 
 
@@ -248,8 +221,6 @@ export default function Dashboard() {
         setintersectionsShown(filteredIntersections.length);
     }, [filteredIntersections]);
     
-    //------------------------------------------------------------------------------------------------
-
 
     // Dashboard UI 
     return(
@@ -326,7 +297,6 @@ export default function Dashboard() {
     ))) : (<div></div>)}
 
     {/* Hidden Tab to show keyboard shortcuts */}
-    {/*----------------------------------------------------------------------------------------------------------------*/}
     {popupFlag &&(
     <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
         <div className="tab-content"> 
@@ -334,7 +304,6 @@ export default function Dashboard() {
                 <div className="shortcut-list">
 
                     {/* x button to close the tab */}
-                    {/*-----------------------------------------------------------------*/}
                     <button className="close-btn" onClick={(e) => {
                          e.stopPropagation();
                          // Minimize Tab
@@ -345,11 +314,9 @@ export default function Dashboard() {
                          // Update flag to hide popup
                          setPopupFlag(false);
                     }}> X </button>
-                    {/*-----------------------------------------------------------------*/}
 
                     <h3>Keyboard Shortcuts</h3>
-                        <ul>
-                            <li><strong> A :</strong> Add Camera Page </li>
+                        <ul data-testid="shortcuts-list">
                             <li><strong> R :</strong> Requests Page </li>
                         </ul>
                     </div>
@@ -359,12 +326,6 @@ export default function Dashboard() {
         </div>
     </div>
     )}
-    {/*----------------------------------------------------------------------------------------------------------------*/}
-
-            {/* Add camera item in list */ }
-                {/* <div className='intersection-add shadow'>
-                <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div> */}
         </div>
     </div>
     );
