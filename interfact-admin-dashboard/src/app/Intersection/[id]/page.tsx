@@ -11,8 +11,7 @@ import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { collection, query, where, getDocs, deleteDoc, updateDoc} from 'firebase/firestore';
 import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
-import { Log } from '@/app/types/Firebase/LogMySql';
-import { debug } from 'console';
+
 
 const IntersectionPage = () => {
 
@@ -20,7 +19,7 @@ const IntersectionPage = () => {
     const intersections = useIntersections();
     const { logs, loading, error } = useLogs();
     const params = useParams();
-    const [reports, setReports] = useState<Report[] | null>([]);
+    const [reports, setReports] = useState<string[] | null>([]);
 
     const [intersection, setIntersection] = useState<Intersection | null>(null);
 
@@ -39,10 +38,15 @@ const IntersectionPage = () => {
     return <div>No valid ID provided.</div>;
     }
 
-    const getReports = (): { logID: string }[] => {
+    const getReports = (): string[] => {
         return userFeedback.flatMap(user => {
             if (Array.isArray(user.reports)) {
-                return user.reports.map(logID => ({ logID: String(logID) }));
+                return user.reports.filter((reportLog : string) => {
+                    // Only get reports for THIS intersection
+                    
+                    const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
+                    return logItem?.cameraid === id
+            });
             }
             return [];
         });
@@ -68,7 +72,7 @@ const IntersectionPage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ logid: logID, status: newStatus }), 
             });
-    
+            
             const updateStatusData = await updateStatusResponse.json();
     
             if (updateStatusResponse.ok) {
@@ -162,13 +166,14 @@ const IntersectionPage = () => {
                 <div className='intersection-reports shadow'>
                 <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
                 {reports && reports.length > 0 ? (
-                    reports.map((report, index) => {
-                        const logItem = logs.find(log => String(log.logid).trim() === String(report.logID).trim()); 
+                    reports.map((report : string, index) => {
 
+                        const logItem = logs.find(log => String(log.logid).trim() === String(report).trim()); 
                         return (
-                            <div key={`${report.logID}-${index}`} data-testid="report">
+                            <div key={`${report}-${index}`} data-testid="report">
+                                {logItem ? (
                                 <div className='report-container'>
-                                    {logItem ? ( 
+                                     
                                         <div className='report-item-1'>
                                             <div className="log-row"><span className="log-label">Log ID:</span> {logItem.logid}</div>
                                             <div className="log-row"><span className="log-label">Camera ID:</span> {logItem.cameraid}</div>
@@ -177,9 +182,7 @@ const IntersectionPage = () => {
                                             <div className="log-row"><span className="log-label">Status:</span> {logItem.status}</div>
                                             <div className="log-row"><span className="log-label">Path:</span> {logItem.path}</div>
                                         </div>
-                                    ) : (
-                                        <p style={{ color: 'red' }}>No matching log found for logID: {report.logID}</p>
-                                    )}
+                                    
                                     <div className='report-buttons-text'>Confirm or deny report:</div>
                                     <div className="report-container2">
                                         <div className='report-buttons'>
@@ -195,6 +198,9 @@ const IntersectionPage = () => {
                                         </div>
                                     </div>
                                 </div>
+                                ) : (
+                                    <br></br>
+                                 )}
                             </div>
                         );
                     })
