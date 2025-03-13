@@ -200,18 +200,11 @@ export default function Dashboard() {
         if (isFilterMaintenance) return item.status === 'MAINTENANCE';
 
         // Cameras that have been updated within 10 minutes
-        if (isFilterWorking){
-            if(calculateDifferenceInMinutes(item.timestamp) < 10){
-                return item.status === "OPERATIONAL"
-            }
-        } 
+        if (isFilterWorking) return calculateDifferenceInMinutes(item.timestamp) < 10
 
         // Cameras that have not been updated within 10 minutes
-        if (isFilterNotWorking){
-            if(calculateDifferenceInMinutes(item.timestamp) > 10){
-                return item.status === "INACTIVE"
-            }
-        } 
+        if (isFilterNotWorking) return calculateDifferenceInMinutes(item.timestamp) > 10
+
         return true; // No filters applied
     });
 
@@ -259,7 +252,7 @@ export default function Dashboard() {
                 <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
                 <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
                 <div onClick={() => filterOptions("Maintenance")} className={isFilterMaintenance === false ? 'filter-option-maintenance': 'filter-option-maintenance-selected'}>UNDER MAINTENANCE</div>
-                <div onClick={() => filterOptions("Working")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
+                <div onClick={() => filterOptions("Operational")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
                 <div onClick={() => filterOptions("Inactive")} className={isFilterNotWorking === false ? 'filter-option-inactive' : 'filter-option-inactive-selected'}>INACTIVE</div>
 
                 </div>
