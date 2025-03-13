@@ -53,3 +53,48 @@ export const mockLogs : Log[] = [
         path: ""
     },
 ];
+
+// An array of UserFeedbacks
+export const mockUserFeedback = [
+    {
+        id: "John Doe",
+        // An array of reports
+        reports: [
+            usedLogIds[0],
+            usedLogIds[3],  
+        ],
+        requests: []
+    },
+
+    {
+        id: "Sam Samuel",
+        reports: [
+            usedLogIds[2],
+            usedLogIds[0],
+            usedLogIds[5],
+        ],
+        requests: []
+    }
+];
+
+
+export const mockIntersections = [
+    {
+        id: 'TEST1',
+        name: 'Street',
+        imagepath: '/test.png',
+        latitude: 100,
+        longitude: 60,
+        status: "blocked",
+        timestamp: 4324234,
+    },
+    {
+        id: 'TEST2',
+        name: 'Road',
+        imagepath: '/test.png',
+        latitude: 324,
+        longitude: 865,
+        status: "blocked",
+        timestamp: 2354252,
+    }
+];
