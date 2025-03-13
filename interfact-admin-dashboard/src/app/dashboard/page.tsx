@@ -61,10 +61,6 @@ export default function Dashboard() {
                     const logIdMatch = String(log.logid) === String(reportLogID);
                     const intersectionMatch = String(log.cameraid) === String(intersectionId);
     
-                    if (logIdMatch && intersectionMatch) {
-                        console.log(`Matching log found: Log ID ${log.logid}, Camera ID ${log.cameraid}`);
-                    }
-    
                     return logIdMatch && intersectionMatch;
                 });
     

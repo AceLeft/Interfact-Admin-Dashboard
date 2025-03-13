@@ -9,6 +9,7 @@ import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
 import { expect } from '@jest/globals';
 import { mockLogs, mockUserFeedback, usedLogIds, mockIntersections } from '../__mocks__/mockData.ts';
+import { DateTime } from 'luxon';
 
 // Mock useRouter:
 const mockPush = jest.fn();
@@ -40,27 +41,33 @@ global.fetch = jest.fn(() =>
   }),
 )
 
+jest.spyOn(DateTime, 'now');
+DateTime.now.mockImplementation(() => DateTime.fromFormat(
+  "November 27, 2024 at 04:18:09PM UTC-4",
+  "MMMM d',' yyyy 'at' hh':'mm':'ssa 'UTC'Z", 
+  { zone: "UTC-4" }
+));
 
 const filterIntersectionData = [
   {
     id: '1',
     name: 'Intersection 1',
     status: 'OPEN',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 27, 2024 at 04:17:00PM UTC-4",
     imagepath: '/image1.jpg',
   },
   {
     id: '2',
     name: 'Intersection 2',
     status: 'BLOCKED',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 25, 2024 at 04:17:00PM UTC-4",
     imagepath: '/image2.jpg',
   },
   {
     id: '3',
     name: 'Intersection 3',
     status: 'MAINTENANCE',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 27, 2024 at 04:17:16PM UTC-4",
     imagepath: '/image3.jpg'
   }
 ];
@@ -220,13 +227,13 @@ describe("Dashboard filters", () => {
     setUpForFilters();
 
     // Select BLOCKED filter
-    const openFilterOption = screen.getByText((content, element) => {
+    const blockedFilterOption = screen.getByText((content, element) => {
       return (
         content === 'BLOCKED' &&
         element.className.includes('filter-option-blocked')
       );
     });
-    fireEvent.click(openFilterOption);
+    fireEvent.click(blockedFilterOption);
 
     // Verify that only BLOCKED status intersection is displayed
     expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
@@ -238,13 +245,13 @@ describe("Dashboard filters", () => {
     setUpForFilters();
 
     // Select UNDER_MAINTENANCE filter
-    const openFilterOption = screen.getByText((content, element) => {
+    const maintFilterOption = screen.getByText((content, element) => {
       return (
         content === 'UNDER MAINTENANCE' &&
         element.className.includes('filter-option-maintenance')
       );
     });
-    fireEvent.click(openFilterOption);
+    fireEvent.click(maintFilterOption);
 
     // Verify that only UNDER_MAINTENANCE status intersection is displayed
     expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
@@ -302,7 +309,42 @@ describe("Dashboard filters", () => {
     expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
     expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
 
-  })
+  });
+
+  it("shows only operational intersections for working filter", () => {
+    setUpForFilters();
+
+    const workingFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'WORKING' &&
+        element.className.includes('filter-option-working')
+      );
+    });
+    fireEvent.click(workingFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
+  });
+
+  it("shows only broken intersections for inactive filter", () => {
+    setUpForFilters();
+
+    // Select OPEN filter using a custom matcher
+    const brokenFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'INACTIVE' &&
+        element.className.includes('filter-option-inactive')
+      );
+    });
+    fireEvent.click(brokenFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.queryByText(filterIntersectionData[0].name)).not.toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
+  });
 
  });
 
