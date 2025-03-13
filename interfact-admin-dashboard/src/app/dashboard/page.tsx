@@ -239,7 +239,7 @@ export default function Dashboard() {
                 {/* Open map view BUTTON */}
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
                 {/* Refresh page BUTTON */}
-                <button onClick={refreshPage} className='refresh-button'><FontAwesomeIcon icon={faArrowsRotate}/></button>
+                <button onClick={refreshPage} className='refresh-button' data-testid="refresh-button"><FontAwesomeIcon icon={faArrowsRotate}/></button>
             </div>
 
             <div className="filter">
@@ -274,7 +274,8 @@ export default function Dashboard() {
                         <img src={item.imagepath} alt={item.name} />
                         <div className="name-reports-container">
                             <div className="item-name">{item.name}</div>
-                            <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
+                            <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"} data-testid={"reports-amount-" + item.id}> 
+                                {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
                         </div>
                     </div>
                 <div className="item-info-container">

@@ -7,6 +7,8 @@ import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
 import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
+import { expect } from '@jest/globals';
+import { mockLogs, mockUserFeedback, usedLogIds, mockIntersections } from '../__mocks__/mockData.ts';
 
 // Mock useRouter:
 const mockPush = jest.fn();
@@ -126,49 +128,60 @@ describe('Default dashboard', () => {
 
     expect(intersectionList).toBeInTheDocument();
   });
+  
+ });
 
 
+ 
+
+describe('Reports', () => {
   it('displays the total number of problems reported in the last 30 days', () => {
     useIntersections.mockReturnValue([]);
-    const userFeedbackData = [
-      { reports: [{ logid: '1' }, { logid: '2' }] },
-      { reports: [{ logid: '3' }] },
-      { reports: [] },
-    ];
-    const logdata = [
-      {
-        logid: '1',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '2',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '3',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '4',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-    ]
-    useUserFeedback.mockReturnValue(userFeedbackData);
-    useLogs.mockReturnValue(logdata);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
     
     render(<Home />);
   
     const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
-    expect(problemsReportedText.textContent).toBe("3");
+    expect(problemsReportedText.textContent).toBe("5");
   });
+
+  it('displays the number of reports on an intersection', () => {
+    useIntersections.mockReturnValue(mockIntersections);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
+    
+    render(<Home />);
   
- });
+    const problemsReportedText = screen.getByTestId("reports-amount-TEST2");
+    
+    expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("1");
+  });
+
+  it('displays no report number if intersection has none', () => {
+    useIntersections.mockReturnValue([{
+      id: 'fakeIntersection',
+      name: 'Road',
+      imagepath: '/test.png',
+      latitude: 324,
+      longitude: 865,
+      status: "blocked",
+      timestamp: 2354252,
+  }]);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
+    
+    render(<Home />);
+  
+    const problemsReportedText = screen.getByTestId("reports-amount-fakeIntersection");
+    
+    expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("");
+  });
+});
 
 function setUpForFilters() {
   useIntersections.mockReturnValue(filterIntersectionData);
@@ -262,6 +275,35 @@ describe("Dashboard filters", () => {
     expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
     expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
   });
+
+  it('removes filters when refresh button pressed', () => {
+    setUpForFilters();
+
+    // Select OPEN filter using a custom matcher
+    const openFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'OPEN' &&
+        element.className.includes('filter-option-open')
+      );
+    });
+    fireEvent.click(openFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
+
+    //Hit refresh
+    const refreshButton = screen.getByTestId("refresh-button");
+    fireEvent.click(refreshButton);
+
+    // Expect all intersections to be in doc
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
+
+  })
+
  });
 
 
@@ -282,6 +324,24 @@ describe("Dashboard navigation", () => {
     fireEvent.click(mapViewButton);
 
     expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
+  });
+
+  it('navigates to request when r is pressed', () => {
+      render(<Home />);
+
+      fireEvent.keyDown(document, {key: 'r'});
+      expect(mockPush).toHaveBeenCalledWith('/requests')
+  });
+
+  it('navigates to the correct intersection', () => {
+      useIntersections.mockReturnValue(mockIntersections);
+
+      render(<Home />);
+
+      const intersectionOne = screen.getByText(mockIntersections[0].name);
+      fireEvent.click(intersectionOne);
+
+      expect(mockPush).toHaveBeenCalledWith('/Intersection/' +mockIntersections[0].id);
   });
 
  });
