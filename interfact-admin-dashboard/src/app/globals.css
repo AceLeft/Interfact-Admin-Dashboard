@@ -992,7 +992,6 @@ body {
   background-color: #d67309;
 }
 
-<<<<<<< HEAD
 .intersection-info-3{
   display: flex;
   justify-content: center;
@@ -1076,6 +1075,7 @@ body {
 .pagination-controls{
   display: flex;
   margin-bottom: 10px;
+  
 }
 
 .p-span{
@@ -1085,12 +1085,13 @@ body {
 .p-button-1, .p-button-2{
   font-family: 'outfit';
 }
-=======
+
 /* Tab Elements */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 /* For Collapsed Tab */
 /* Some elements might be unnecessary, used an online example as a guideline */
+
 .close-btn {
   position: absolute;
   top: 10px;
@@ -1153,5 +1154,4 @@ body {
   color: white;
 }
 
-/*--------------------------------------------------------------------------------------------------------------------*/
->>>>>>> 6e7432aa8c9972b343533fe15b54d6808bf31d58
+
