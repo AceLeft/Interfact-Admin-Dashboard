@@ -1,16 +1,14 @@
 'use client';
-// @ts-ignore
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
-import { faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
+import { useLogs } from '../hooks/useLogs'; 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "./timeCaculator";
-import { useLogs } from '../hooks/useLogs'; 
+
 
 export default function Dashboard() {
 
@@ -33,7 +31,10 @@ export default function Dashboard() {
     const [ intersectionsShown, setintersectionsShown] = useState<number | null>(0);
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
-    //------------------------------------------------------------------
+    // Tab is hidden on default
+    const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
+    // Flag that controls popup visibility
+    const [popupFlag, setPopupFlag] = useState(true);
 
 
 
@@ -48,13 +49,9 @@ export default function Dashboard() {
     }, 0);
 
     const getReportsForIntersection = (intersectionId: string) => {
-        console.log("Checking reports for intersection ID:", intersectionId);
-        console.log("Logs data:", logs);
-        console.log("User Feedback data:", userFeedback);
     
         return userFeedback.reduce((total, user) => {
             if (!Array.isArray(user.reports) || user.reports.length === 0) {
-                console.log(`User ${user.id} has no reports`);
                 return total; 
             }
     
@@ -73,15 +70,11 @@ export default function Dashboard() {
     
                 return !!matchingLog; // Keep only reports that match a valid log
             });
-    
-            console.log(`User ${user.id} has ${matchingReports.length} reports for intersection ${intersectionId}`);
-    
+        
             return total + matchingReports.length;
         }, 0);
     };
-    
-    
-    //------------------------------------------------------------------------------------------------
+
 
 
 
@@ -111,17 +104,15 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
       };
 
-    const goToAddCamera = () =>{
-        router.push("/add_camera")
-    }
-
-    // Keyboard shortcuts
+    
+    const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+    // ------------------------- Keyboard shortcuts -------------------------
+    
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            // If the c key is pressed
-            if (event.key.toLowerCase() === 'c') {
-                // Redirect to add camera page
-                router.push('/add_camera');
+
+            if (event.key.toLowerCase() === 'r') {
+                router.push('/requests');
             }
         };
         // EventListener is needed for keydown events
@@ -132,8 +123,16 @@ export default function Dashboard() {
         };
     }, [router]);
 
-    //------------------------------------------------------------------------------------------------
 
+    // ------------------------- Popup Close -------------------------
+    useEffect(() => {
+        // Check localStorage if the popup has been closed before
+        const hasClosedPopup = localStorage.getItem('popupFlag');
+        
+        if (hasClosedPopup === 'false') {
+            // Popup wont show if flag is false
+            setPopupFlag(false);
+        }}, []);
 
 
 
@@ -222,8 +221,6 @@ export default function Dashboard() {
         setintersectionsShown(filteredIntersections.length);
     }, [filteredIntersections]);
     
-    //------------------------------------------------------------------------------------------------
-
 
     // Dashboard UI 
     return(
@@ -233,7 +230,10 @@ export default function Dashboard() {
                     <div className="dash-main-1">Muncie, IN</div>
                     {/* <hr /> */}
                     <div className="dash-main-2">Total Intersections | <span>{totalIntersections}</span></div>
-                    <div className="dash-main-3">Problems Reported | <span>{getTotalReports}</span></div>
+                    
+                    <div className="dash-main-3" >Problems Reported | 
+                        {/* The data-testid is necessary for testing */}
+                        <span data-testid="reports-amount">{getTotalReports}</span></div>
                 </div>
 
                 {/* Open map view BUTTON */}
@@ -296,11 +296,37 @@ export default function Dashboard() {
         </div>
     ))) : (<div></div>)}
 
-    {/* Add camera item in list */ }
-                {/* <div className='intersection-add shadow'>
-                    <div onClick={goToAddCamera} className='fa-plus shadow'><FontAwesomeIcon icon={faPlus} size='3x'/></div>
-                </div> */}
-            </div>
+    {/* Hidden Tab to show keyboard shortcuts */}
+    {popupFlag &&(
+    <div className={`keyboard-shortcut-tab ${isShortcutTabExpanded ? 'expanded' : ''}`} onClick={tabToggle}>
+        <div className="tab-content"> 
+            {isShortcutTabExpanded ? (
+                <div className="shortcut-list">
+
+                    {/* x button to close the tab */}
+                    <button className="close-btn" onClick={(e) => {
+                         e.stopPropagation();
+                         // Minimize Tab
+                         setIsShortcutTabExpanded(false);
+                         // localStorage saves value pairs in the browser. Is saved after browser close.
+                         // Store the flag in localStorage to show x has been clicked previously
+                         localStorage.setItem('popupFlag', 'false');
+                         // Update flag to hide popup
+                         setPopupFlag(false);
+                    }}> X </button>
+
+                    <h3>Keyboard Shortcuts</h3>
+                        <ul data-testid="shortcuts-list">
+                            <li><strong> R :</strong> Requests Page </li>
+                        </ul>
+                    </div>
+            ) : (
+                <span>Keyboard Shortcuts</span>
+            )}
         </div>
+    </div>
+    )}
+        </div>
+    </div>
     );
 }

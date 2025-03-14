@@ -5,6 +5,7 @@ import Home from '../src/app/dashboard/page.tsx';
 import { useIntersections } from '../src/app/hooks/useIntersections';
 import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
+import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
 
 // Mock useRouter:
@@ -26,6 +27,16 @@ jest.mock('../src/app/hooks/useIntersections', () => ({
 jest.mock('../src/app/hooks/useUserFeedback', () => ({
   useUserFeedback: jest.fn(),
 }));
+
+jest.mock('../src/app/hooks/useLogs', () => ({
+  useLogs: jest.fn(),
+}));
+
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve([]),
+  }),
+)
 
 
 const filterIntersectionData = [
@@ -56,6 +67,7 @@ const filterIntersectionData = [
 describe('Default dashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useLogs.mockReturnValue({logs: [], loading: false, error: null});
   });
 
   it('displays intersections correctly', () => {
@@ -119,19 +131,41 @@ describe('Default dashboard', () => {
   it('displays the total number of problems reported in the last 30 days', () => {
     useIntersections.mockReturnValue([]);
     const userFeedbackData = [
-      { reports: [{ reportid: '1' }, { reportid: '2' }] },
-      { reports: [{ reportid: '3' }] },
+      { reports: [{ logid: '1' }, { logid: '2' }] },
+      { reports: [{ logid: '3' }] },
       { reports: [] },
     ];
+    const logdata = [
+      {
+        logid: '1',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '2',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '3',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+      {
+        logid: '4',
+        cameraid: "", timestamp: "", filename: "",
+        status: "", path: ""
+      },
+    ]
     useUserFeedback.mockReturnValue(userFeedbackData);
-  
+    useLogs.mockReturnValue(logdata);
+    
     render(<Home />);
   
-    const problemsReportedText = screen.getByText((content, element) => {
-      return element.textContent === 'Problems Reported (Last 30 days) | 3';
-    });
+    const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("3");
   });
   
  });
@@ -250,24 +284,60 @@ describe("Dashboard navigation", () => {
     expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
   });
 
-
-  it('clicking on the Add button navigates to /add_camera', () => {
-    useIntersections.mockReturnValue([]);
-    useUserFeedback.mockReturnValue([]);
-  
-    const { container } = render(<Home />);
-    // Select the Add button using class name
-    const addButton = container.querySelector('.fa-plus');
-    expect(addButton).toBeInTheDocument();
-    fireEvent.click(addButton);
-
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-  });  
-
-  it('should navigate to the add camera page when "c" is pressed', () => {
-    render(<Home />);
-    fireEvent.keyDown(document, {key: 'c'});
- 
-    expect(mockPush).toHaveBeenCalledWith('/add_camera');
-   });
  });
+
+ 
+ 
+describe("Dashboard popup behavior", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // LocalStorage cleared before each test
+    localStorage.clear();
+  });
+
+  it('Popup is visible when popupFlag is not in localStorage', () => {
+    render(<Home />);
+
+    // Test if the popup is visible by scanning the screen for popup text
+    const popup = screen.getByText('Keyboard Shortcuts');
+    expect(popup).toBeInTheDocument();
+  });
+
+  it('shows the shortcuts when the popup is clicked', () => {
+    render(<Home />);
+
+    const popup = screen.getByText('Keyboard Shortcuts');
+    expect(popup).toBeInTheDocument();
+    fireEvent.click(popup);
+
+    const shortcuts = screen.getByTestId("shortcuts-list");
+    expect(shortcuts).toBeInTheDocument();
+  })
+
+  it('X button hides the popup & stores the flag in localStorage when clicked', () => {
+    render(<Home />);
+
+    const popup = screen.getByText('Keyboard Shortcuts');
+    expect(popup).toBeInTheDocument();
+    fireEvent.click(popup);
+
+    // Click the X button to close the popup
+    const closeButton = screen.getByText('X');
+    fireEvent.click(closeButton);
+
+    // Test that the popup is no longer visible after clicking the X button
+    expect(screen.queryByText('Keyboard Shortcuts')).not.toBeInTheDocument();
+
+    // Test that the flag is in localStorage (setPopupFlag = false / the popup is not set)
+    expect(localStorage.getItem('popupFlag')).toBe('false');
+  });
+
+  it('Popup is not visable after the X button is clicked and page is reloaded', () => {
+    // Popup is already saved in localStorage
+    localStorage.setItem('popupFlag', 'false');
+
+    render(<Home />);
+    expect(screen.queryByText('Keyboard Shortcuts')).not.toBeInTheDocument();
+  });
+ 
+});
