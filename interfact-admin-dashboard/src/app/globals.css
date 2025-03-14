@@ -601,7 +601,6 @@ body {
   border-radius: 15px;
   flex-direction: column;
   font-family: 'outfit';
-  margin-bottom: 100px;
   transition: all .1s;
 }
 .intersection-reports p{
@@ -620,7 +619,6 @@ body {
   padding: 2px 10px 2px 10px;
   margin-left: 10px;
   font-size: .8em;
-
   border-radius: 50px;
 }
 
@@ -634,7 +632,6 @@ body {
   flex-direction: column;
   padding: 15px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 200px;
 }
 
 .intersection-logs h1 {
@@ -995,6 +992,100 @@ body {
   background-color: #d67309;
 }
 
+<<<<<<< HEAD
+.intersection-info-3{
+  display: flex;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 70px;
+  border-radius: 15px;
+  margin-top: 28px;
+}
+
+.log-vis-1{
+  display: flex;
+  flex: 3;
+  background-color: white;
+  border-radius: 15px;
+  flex-direction: column;
+  font-family: 'outfit';
+  margin-bottom: 100px;
+  transition: all .1s;
+}
+
+.log-time-prediction{
+  display: flex;
+  flex: 6;
+  background-color: white;
+  border-radius: 15px;
+  flex-direction: column;
+  font-family: 'outfit';
+  margin-bottom: 100px;
+  transition: all .1s;
+  height: 400px;
+  margin-left: 28px;
+  justify-content: center;
+  align-items: center;
+}
+
+.time-container{
+  width: 600px;
+  height: 100px;
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.time{
+  width: 55px;
+  height: 55px;
+  background-color: #1d2022;
+  transition: all .22s;
+  color: #ffffff;
+  border-radius: 55px;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  text-align: center; 
+  cursor: pointer;
+  font-family: 'oswald';
+  /* border: #42fa42 solid 3px; */
+}
+
+.times-row{
+  display: flex;
+  gap: 10px;
+}
+
+.time:hover{
+  scale: 1.2;
+  
+  /* background-color: #fe8732; */
+}
+
+.score-display{
+  position: 'absolute';
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.pagination-controls{
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.p-span{
+  padding: 10px;
+}
+
+.p-button-1, .p-button-2{
+  font-family: 'outfit';
+}
+=======
 /* Tab Elements */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -1063,3 +1154,4 @@ body {
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+>>>>>>> 6e7432aa8c9972b343533fe15b54d6808bf31d58

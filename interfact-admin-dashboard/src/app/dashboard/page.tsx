@@ -159,7 +159,7 @@ export default function Dashboard() {
                     setIsFilterBlocked(!isFilterBlocked)
                 }
                 break;
-            
+                    
                 case 'Maintenance':
                 if(isFilterOpen !== true || isFilterBlocked !== true){
                     setIsFilterMaintenance(!isFilterMaintenance)
