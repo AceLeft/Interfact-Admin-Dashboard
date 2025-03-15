@@ -58,6 +58,6 @@ export const calculateHourlyScores = (logs: Log[], intersectionId: string): Hour
       scores[hour] = Math.floor(normalized * 10);
     }
   }
-
+  console.log(scores);
   return scores;
 };
