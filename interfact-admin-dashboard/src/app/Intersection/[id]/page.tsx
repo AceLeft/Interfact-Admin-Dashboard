@@ -3,16 +3,13 @@ import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
-import { Report } from '@/app/types/Firebase/reportFB';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
-import { collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
-import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
 import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
-import { Log } from '@/app/types/Firebase/LogMySql';
+import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
 
 const LOGS_PER_PAGE = 250;
 
@@ -68,7 +65,7 @@ const IntersectionPage = () => {
         }
         return [];
     });
-};
+  };
 
 
   useEffect(() => {
@@ -95,19 +92,8 @@ const IntersectionPage = () => {
         return;
       }
 
-      const usersRef = collection(dbFB, 'users');
-      const snapshot = await getDocs(usersRef);
-      const updates = snapshot.docs.map(async (docSnap) => {
-        const userData = docSnap.data();
-        if (Array.isArray(userData.reports)) {
-          const filteredReports = userData.reports.filter(report => String(report) !== String(logID));
-          if (filteredReports.length !== userData.reports.length) {
-            return updateDoc(docSnap.ref, { reports: filteredReports });
-          }
-        }
-      });
+      deleteFromDB(logID);
 
-      await Promise.all(updates);
 
       const confirmResponse = await fetch('/api/report', {
         method: 'POST',
@@ -127,19 +113,7 @@ const IntersectionPage = () => {
 
   const denyReport = async (logID: string) => {
     try {
-      const usersRef = collection(dbFB, 'users');
-      const snapshot = await getDocs(usersRef);
-      const updates = snapshot.docs.map((docSnap) => {
-        const data = docSnap.data();
-        if (Array.isArray(data.reports)) {
-          const filteredReports = data.reports.filter(report => String(report) !== String(logID));
-          if (filteredReports.length !== data.reports.length) {
-            return updateDoc(docSnap.ref, { reports: filteredReports });
-          }
-        }
-        return null;
-      });
-      await Promise.all(updates);
+      deleteFromDB(logID);
     } catch (error) {
       console.error('Error removing report:', error);
     }
