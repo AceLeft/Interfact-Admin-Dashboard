@@ -21,7 +21,7 @@ const IntersectionPage = () => {
   const intersections = useIntersections();
   const { logs, loading, error } = useLogs();
   const params = useParams();
-  const [reports, setReports] = useState<Report[] | null>([]);
+  const [reports, setReports] = useState<string[] | null>([]);
   const [hourlyScores, setHourlyScores] = useState<HourlyScores>({});
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
@@ -56,14 +56,20 @@ const IntersectionPage = () => {
     return <div>No valid ID provided.</div>;
   }
 
-  const getReports = (): { logID: string }[] => {
-    return userFeedback.flatMap((user) => {
-      if (Array.isArray(user.reports)) {
-        return user.reports.map((logID) => ({ logID: String(logID) }));
-      }
-      return [];
+  const getReports = (): string[] => {
+    return userFeedback.flatMap(user => {
+        if (Array.isArray(user.reports)) {
+            return user.reports.filter((reportLog : string) => {
+                // Only get reports for THIS intersection
+                
+                const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
+                return logItem?.cameraid === id
+        });
+        }
+        return [];
     });
-  };
+};
+
 
   useEffect(() => {
     if (userFeedback.length > 0 && logs.length > 0) {
@@ -102,7 +108,6 @@ const IntersectionPage = () => {
       });
 
       await Promise.all(updates);
-      console.log(`Report ${logID} removed from users' reports`);
 
       const confirmResponse = await fetch('/api/report', {
         method: 'POST',
@@ -135,7 +140,6 @@ const IntersectionPage = () => {
         return null;
       });
       await Promise.all(updates);
-      console.log(`Reports with logID ${logID} removed.`);
     } catch (error) {
       console.error('Error removing report:', error);
     }
@@ -184,10 +188,10 @@ const IntersectionPage = () => {
         <div className='intersection-reports shadow'>
           <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
           {reports && reports.length > 0 ? (
-            reports.map((report, index) => {
-              const logItem = logs.find(log => String(log.logid).trim() === String(report.logID).trim());
+            reports.map((report : string, index) => {
+              const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
               return (
-                <div key={`${report.logID}-${index}`} data-testid="report">
+                <div key={`${report}-${index}`} data-testid="report">
                   <div className='report-container'>
                     {logItem ? (
                       <div className='report-item-1'>
@@ -199,7 +203,7 @@ const IntersectionPage = () => {
                         <div className="log-row"><span className="log-label">Path:</span> {logItem.path}</div>
                       </div>
                     ) : (
-                      <p style={{ color: 'red' }}>No matching log found for logID: {report.logID}</p>
+                      <p style={{ color: 'red' }}>No matching log found for logID: {report}</p>
                     )}
                     <div className='report-buttons-text'>Confirm or deny report:</div>
                     <div className="report-container2">
