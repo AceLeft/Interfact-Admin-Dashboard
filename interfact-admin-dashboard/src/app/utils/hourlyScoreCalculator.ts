@@ -47,9 +47,10 @@ export const calculateHourlyScores = (logs: Log[], intersectionId: string): Hour
   //compare each hour's ratio to the overall min/max and normalize to a score between 1 and 10
   for (let hour = 0; hour < 24; hour++) {
     //0 if no logs
-    const ratio = hourRatios[hour] !== undefined ? hourRatios[hour] : 0;
-    if (maxRatio === minRatio) {
-      //if all hours have the same ratio
+    const ratio = (hourRatios[hour] !== undefined) ? hourRatios[hour] : 0;
+    if (maxRatio === minRatio || minRatio === Infinity) {
+      //if all hours have the same ratio or no logs
+      
       scores[hour] = Math.floor(ratio * 10);
     } else {
       // Normalize the ratio to yield a value between 0 and 1
@@ -58,6 +59,5 @@ export const calculateHourlyScores = (logs: Log[], intersectionId: string): Hour
       scores[hour] = Math.floor(normalized * 10);
     }
   }
-  console.log(scores);
   return scores;
 };
