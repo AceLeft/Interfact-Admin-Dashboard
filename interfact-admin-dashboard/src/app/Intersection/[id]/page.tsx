@@ -27,6 +27,7 @@ const IntersectionPage = () => {
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
   const [intersection, setIntersection] = useState<Intersection | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [blockedTime, setBlockedTime] = useState<number>(1);
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -270,8 +271,8 @@ const IntersectionPage = () => {
         </div>
       </div>
       <div className='intersection-info-3'>
-        <div className='log-vis-1 shadow'>
-          {/* Your additional content here */}
+        <div className='log-overall-time shadow'>
+            <div>Total Time Blocked: {blockedTime} minutes (Last 24 hours)</div>
         </div>
         <div className='log-time-prediction shadow' style={{ position: 'relative' }}>
           {(() => {
