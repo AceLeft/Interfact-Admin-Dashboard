@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { useLogs } from '@/app/hooks/useLogs';
-import { calculateHourlyScores, HourlyScores } from '@/app/utils/hourlyScoreCalculator';
+import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
 import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
 
 const LOGS_PER_PAGE = 250;
