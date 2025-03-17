@@ -3,10 +3,13 @@ import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
+import { Report } from '@/app/types/Firebase/reportFB';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
+import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
 import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
 import { Log } from '@/app/types/Firebase/LogMySql';
@@ -24,7 +27,7 @@ const IntersectionPage = () => {
   const intersections = useIntersections();
   const { logs, loading, error } = useLogs();
   const params = useParams();
-  const [reports, setReports] = useState<string[] | null>([]);
+  const [reports, setReports] = useState<Report[] | null>([]);
   const [hourlyScores, setHourlyScores] = useState<HourlyScores>({});
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
@@ -104,10 +107,10 @@ const IntersectionPage = () => {
         <div className='intersection-reports shadow'>
           <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
           {reports && reports.length > 0 ? (
-            reports.map((report : string, index) => {
-              const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
+            reports.map((report, index) => {
+              const logItem = logs.find(log => String(log.logid).trim() === String(report.logID).trim());
               return (
-                <div key={`${report}-${index}`} data-testid="report">
+                <div key={`${report.logID}-${index}`} data-testid="report">
                   <div className='report-container'>
                     {logItem ? (
                       <div className='report-item-1'>
@@ -119,7 +122,7 @@ const IntersectionPage = () => {
                         <div className="log-row"><span className="log-label">Path:</span> {logItem.path}</div>
                       </div>
                     ) : (
-                      <p style={{ color: 'red' }}>No matching log found for logID: {report}</p>
+                      <p style={{ color: 'red' }}>No matching log found for logID: {report.logID}</p>
                     )}
                     <div className='report-buttons-text'>Confirm or deny report:</div>
                     <div className="report-container2">
