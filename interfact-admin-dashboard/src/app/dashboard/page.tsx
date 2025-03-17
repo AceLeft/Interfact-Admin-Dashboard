@@ -178,7 +178,7 @@ export default function Dashboard() {
         // Toggles true or false
         setIsFiltering(!isFiltering) 
     } 
-
+    
     // Handles filter options
     const filterOptions = (selectedOption: string) => {
         switch (selectedOption) {
@@ -222,6 +222,39 @@ export default function Dashboard() {
                 break;
         }
     };
+
+    //------------------ Load Filter States from localStorage -----------------
+    useEffect(() => {
+        // Get filter states from localStorage when page loads
+        const savedFilters = JSON.parse(localStorage.getItem('filters') || '{}');
+
+        // Set each of the filter states if the element isnt undefined
+        if (savedFilters.isFilterOpen !== undefined) setIsFilterOpen(savedFilters.isFilterOpen);
+        if (savedFilters.isFilterBlocked !== undefined) setIsFilterBlocked(savedFilters.isFilterBlocked);
+        if (savedFilters.isFilterMaintenance !== undefined) setIsFilterMaintenance(savedFilters.isFilterMaintenance);
+        if (savedFilters.isFilterWorking !== undefined) setIsFilterWorking(savedFilters.isFilterWorking);
+        if (savedFilters.isFilterNotWorking !== undefined) setIsFilterNotWorking(savedFilters.isFilterNotWorking);
+        if (savedFilters.isFiltering !== undefined) setIsFiltering(savedFilters.isFiltering);
+    }, []); // Empty array so this runs when the page loads
+
+    //------------------ Save Filter States to localStorage -----------------
+    // Will run whenever a filter is changed
+    useEffect(() => {
+        // Store current filter states in localStorage whenever any of the filter state changes
+        const filterStates = {
+            isFiltering,
+            isFilterOpen,
+            isFilterBlocked,
+            isFilterMaintenance,
+            isFilterWorking,
+            isFilterNotWorking
+        };
+
+        // Save the filter states in JSON string
+        localStorage.setItem('filters', JSON.stringify(filterStates));
+    }, [isFiltering, isFilterOpen, isFilterBlocked, isFilterMaintenance, isFilterWorking, isFilterNotWorking]); 
+
+    
 
     // Filters intersections based on applied filters
     const filteredIntersections = intersections.filter((item) => {
