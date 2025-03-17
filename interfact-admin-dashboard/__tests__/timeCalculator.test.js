@@ -1,5 +1,5 @@
 import { DateTime } from "luxon"
-import calculateDifferenceInMinutes from "../src/app/dashboard/timeCaculator"
+import calculateDifferenceInMinutes from "../src/app/utils/dashboard/timeCaculator"
 
   const mockCurrentTime = DateTime.fromFormat(
     "November 27, 2024 at 04:17:00PM UTC-4",
