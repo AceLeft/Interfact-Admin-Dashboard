@@ -13,6 +13,8 @@ import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
 import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
 import { Log } from '@/app/types/Firebase/LogMySql';
+import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
+import { calculateAverageBlockageTime } from '@/app/utils/calculateAverageBlockageTime';
 
 const LOGS_PER_PAGE = 250;
 
@@ -27,7 +29,9 @@ const IntersectionPage = () => {
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
   const [intersection, setIntersection] = useState<Intersection | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [blockedTime, setBlockedTime] = useState<number>(1);
+  const [blockedDayTime, setBlockedDayTime] = useState<number>(1);
+  const [blockedWeekTime, setBlockedWeekTime] = useState<number>(1);
+  const [avgBlockTime, setAvgBlockTime] = useState<number>(1);
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -44,6 +48,21 @@ const IntersectionPage = () => {
     if (logs.length > 0 && intersection) {
       const scores: HourlyScores = calculateHourlyScores(logs, intersection.id);
       setHourlyScores(scores);
+    }
+  }, [logs, intersection]);
+
+  useEffect(() => {
+    if (logs.length > 0 && intersection) {
+      const [blockedDayTime, blockedWeekTime] = calculateTotalBlocks(logs, intersection.id);
+      setBlockedDayTime(blockedDayTime);
+      setBlockedWeekTime(blockedWeekTime);
+    }
+  }, [logs, intersection]);
+
+  useEffect(() => {
+    if (logs.length > 0 && intersection) {
+      const avgBlock = calculateAverageBlockageTime(logs, intersection.id);
+      setAvgBlockTime(avgBlock)
     }
   }, [logs, intersection]);
 
@@ -272,7 +291,9 @@ const IntersectionPage = () => {
       </div>
       <div className='intersection-info-3'>
         <div className='log-overall-time shadow'>
-            <div>Total Time Blocked: {blockedTime} minutes (Last 24 hours)</div>
+        <div className='total-block-time'><h1>Average Time Blocked:</h1> <h2>{avgBlockTime} minutes</h2></div>
+            <div className='total-block-time'><h1>Total Time Blocked (Last 24 hours):</h1> <h2>{blockedDayTime} minutes</h2></div>
+            <div className='total-block-time'><h1>Total Time Blocked (Last Week):</h1> <h2>{blockedWeekTime} minutes</h2></div>
         </div>
         <div className='log-time-prediction shadow' style={{ position: 'relative' }}>
           {(() => {
@@ -282,53 +303,7 @@ const IntersectionPage = () => {
             ];
             return (
               <>
-                <div className="time-container">
-                  <div className='time-am'>
-                    <h1>PM</h1>
-                    <div className="times-row">
-                      {times.map((time, idx) => {
-                        const actualHour = idx + 12;
-                        return (
-                          <div
-                            key={`pm-${time}`}
-                            className="time"
-                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("PM"); }}
-                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
-                            style={{
-                              color: hourlyScores[actualHour] !== undefined
-                                ? getTimeColor(hourlyScores[actualHour])
-                                : 'inherit'
-                            }}>
-                            <strong>{time}</strong>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="time-pm">
-                    <h1>AM</h1>
-                    <div className="times-row">
-                      {times.map((time, idx) => {
-                        const actualHour = idx;
-                        return (
-                          <div
-                            key={`am-${time}`}
-                            className="time"
-                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("AM"); }}
-                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
-                            style={{
-                              color: hourlyScores[actualHour] !== undefined
-                                ? getTimeColor(hourlyScores[actualHour])
-                                : 'inherit'
-                            }}>
-                            <strong>{time}</strong>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-                <div className="score-display">
+              <div className="score-display">
                   {hoveredHour !== null && hourlyScores[hoveredHour] !== undefined ? (
                     <p>
                       {hoveredHour < 12 ? times[hoveredHour] : times[hoveredHour - 12]}{" "}
@@ -338,6 +313,75 @@ const IntersectionPage = () => {
                     <p>&nbsp;</p>
                   )}
                 </div>
+                <div className="time-container">
+                  <div className='time-am'>
+                    <div className="times-row">
+                      {times.map((time, idx) => {
+                        const actualHour = idx + 12;
+                        const minHeight = 55;
+                        const maxHeight = 230;
+                        const score = hourlyScores[actualHour];
+                        const normalizedHeight = minHeight + (score / 9) * (maxHeight - minHeight);
+                        const heightPx = `${normalizedHeight}px`;
+                        return (
+                          <div
+                            key={`pm-${time}`}
+                            className="time"
+                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("PM"); }}
+                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
+                            style={{
+                              borderColor: hourlyScores[actualHour] !== undefined
+                                ? getTimeColor(hourlyScores[actualHour])
+                                : 'inherit',
+                              height: hourlyScores[actualHour] !== undefined
+                              ? heightPx
+                              : 'auto'
+                            }}>
+                            <div className='time-text'>
+                              <strong>{time}</strong>
+                              <strong>PM</strong>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div className='separate-bar'></div>
+                      {times.map((time, idx) => {
+                        const actualHour = idx;
+                        const minHeight = 55;
+                        const maxHeight = 230;
+                        const score = hourlyScores[actualHour];
+                        const normalizedHeight = minHeight + (score / 9) * (maxHeight - minHeight);
+                        const heightPx = `${normalizedHeight}px`;
+                        return (
+                          <div
+                            key={`am-${time}`}
+                            className="time"
+                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("AM"); }}
+                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
+                            style={{
+                              borderColor: hourlyScores[actualHour] !== undefined
+                                ? getTimeColor(hourlyScores[actualHour])
+                                : 'inherit',
+                              height: hourlyScores[actualHour] !== undefined
+                                ? heightPx
+                                : 'auto'
+                            }}>
+                            <div className='time-text'>
+                              <strong>{time}</strong>
+                              <strong>AM</strong>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="time-pm">
+                    <div className="times-row">
+                      
+                    </div>
+                  </div>
+                </div>
+                
               </>
             );
           })()}
