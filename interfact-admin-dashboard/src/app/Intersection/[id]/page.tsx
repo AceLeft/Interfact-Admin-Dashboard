@@ -3,17 +3,22 @@ import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
+import { Report } from '@/app/types/Firebase/reportFB';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { collection, query, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
+import { dbFB } from '../../../../FirebaseConfig';
 import { useLogs } from '@/app/hooks/useLogs';
 import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
 import { Log } from '@/app/types/Firebase/LogMySql';
 import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
 import { calculateAverageBlockageTime } from '@/app/utils/calculateAverageBlockageTime';
-import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
-
+import { getReports } from '@/app/utils/intersection/getReports';
+import { confirmReport } from '@/app/utils/intersection/confirmReport';
+import { denyReport } from '@/app/utils/intersection/denyReport';
+import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
 
 const LOGS_PER_PAGE = 250;
 
@@ -22,7 +27,7 @@ const IntersectionPage = () => {
   const intersections = useIntersections();
   const { logs, loading, error } = useLogs();
   const params = useParams();
-  const [reports, setReports] = useState<string[] | null>([]);
+  const [reports, setReports] = useState<Report[] | null>([]);
   const [hourlyScores, setHourlyScores] = useState<HourlyScores>({});
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
@@ -47,23 +52,16 @@ const IntersectionPage = () => {
     if (logs.length > 0 && intersection) {
       const scores: HourlyScores = calculateHourlyScores(logs, intersection.id);
       setHourlyScores(scores);
-    }
-  }, [logs, intersection]);
-
-  useEffect(() => {
-    if (logs.length > 0 && intersection) {
+  
       const [blockedDayTime, blockedWeekTime] = calculateTotalBlocks(logs, intersection.id);
       setBlockedDayTime(blockedDayTime);
       setBlockedWeekTime(blockedWeekTime);
-    }
-  }, [logs, intersection]);
-
-  useEffect(() => {
-    if (logs.length > 0 && intersection) {
+  
       const avgBlock = calculateAverageBlockageTime(logs, intersection.id);
-      setAvgBlockTime(avgBlock)
+      setAvgBlockTime(avgBlock);
     }
   }, [logs, intersection]);
+  
 
   // Reset page when logs or intersection change
   useEffect(() => {
@@ -74,87 +72,13 @@ const IntersectionPage = () => {
     return <div>No valid ID provided.</div>;
   }
 
-  const getReports = (): string[] => {
-    return userFeedback.flatMap(user => {
-        if (Array.isArray(user.reports)) {
-            return user.reports.filter((reportLog : string) => {
-                // Only get reports for THIS intersection
-                
-                const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
-                return logItem?.cameraid === id
-        });
-        }
-        return [];
-    });
-  };
-
 
   useEffect(() => {
     if (userFeedback.length > 0 && logs.length > 0) {
-      setReports(getReports());
+      setReports(getReports(userFeedback));
     }
   }, [userFeedback, logs]);
 
-  const confirmReport = async (url: string, logID: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === "BLOCKED" ? "OPEN" : "BLOCKED";
-      const updateStatusResponse = await fetch('/api/logs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logid: logID, status: newStatus }),
-      });
-
-      const updateStatusData = await updateStatusResponse.json();
-
-      if (updateStatusResponse.ok) {
-        console.log(`Status updated to ${newStatus} for logID: ${logID}`);
-      } else {
-        console.error("Error updating status:", updateStatusData.message);
-        return;
-      }
-
-      deleteFromDB(logID);
-
-
-      const confirmResponse = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      });
-
-      const confirmData = await confirmResponse.json();
-
-      if (!confirmResponse.ok) {
-        console.error("Error confirming report:", confirmData.message);
-      }
-    } catch (error) {
-      console.error('Request failed:', error);
-    }
-  };
-
-  const denyReport = async (logID: string) => {
-    try {
-      deleteFromDB(logID);
-    } catch (error) {
-      console.error('Error removing report:', error);
-    }
-  };
-
-  const getTimeColor = (score: number): string => {
-    if (score <= 1) return 'green';
-    switch (score) {
-      case 2: return '#FA9E9E';
-      case 3: return '#F87777';
-      case 4: return '#F76464';
-      case 5: return '#F65151';
-      case 6: return '#F53D3D';
-      case 7: return '#F42A2A';
-      case 8: return '#F31616';
-      case 9: return '#E90C0C';
-      case 10: return '#C20A0A';
-      default: return 'green';
-    }
-  };
 
   // Filter logs for the current intersection
   const filteredLogs = intersection ? logs.filter(log => log.cameraid === intersection.id) : [];
@@ -183,10 +107,10 @@ const IntersectionPage = () => {
         <div className='intersection-reports shadow'>
           <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
           {reports && reports.length > 0 ? (
-            reports.map((report : string, index) => {
-              const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
+            reports.map((report, index) => {
+              const logItem = logs.find(log => String(log.logid).trim() === String(report.logID).trim());
               return (
-                <div key={`${report}-${index}`} data-testid="report">
+                <div key={`${report.logID}-${index}`} data-testid="report">
                   <div className='report-container'>
                     {logItem ? (
                       <div className='report-item-1'>
@@ -198,7 +122,7 @@ const IntersectionPage = () => {
                         <div className="log-row"><span className="log-label">Path:</span> {logItem.path}</div>
                       </div>
                     ) : (
-                      <p style={{ color: 'red' }}>No matching log found for logID: {report}</p>
+                      <p style={{ color: 'red' }}>No matching log found for logID: {report.logID}</p>
                     )}
                     <div className='report-buttons-text'>Confirm or deny report:</div>
                     <div className="report-container2">

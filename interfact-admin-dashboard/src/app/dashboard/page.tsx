@@ -1,3 +1,4 @@
+
 'use client';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
@@ -7,8 +8,10 @@ import { useUserFeedback } from '../hooks/useUserFeedback';
 import { useLogs } from '../hooks/useLogs'; 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import calculateDifferenceInMinutes from "./timeCaculator";
-
+import calculateDifferenceInMinutes from "../utils/dashboard/timeCaculator";
+import { getReportsForIntersection } from "../utils/dashboard/getReportsForIntersection";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useIntersectionFilters } from "../hooks/useIntersectionFilters";
 
 export default function Dashboard() {
 
@@ -48,36 +51,9 @@ export default function Dashboard() {
         return total + (user.reports ? user.reports.length : 0);
     }, 0);
 
-    const getReportsForIntersection = (intersectionId: string) => {
-    
-        return userFeedback.reduce((total, user) => {
-            if (!Array.isArray(user.reports) || user.reports.length === 0) {
-                return total; 
-            }
-    
-            // Convert log IDs to strings to match user reports
-            const matchingReports = user.reports.filter(reportLogID => {
-                const matchingLog = logs.find(log => {
-                    const logIdMatch = String(log.logid) === String(reportLogID);
-                    const intersectionMatch = String(log.cameraid) === String(intersectionId);
-    
-                    return logIdMatch && intersectionMatch;
-                });
-    
-                return !!matchingLog; // Keep only reports that match a valid log
-            });
-        
-            return total + matchingReports.length;
-        }, 0);
-    };
-
-
-
-
-
     //----------------------------------- Page Utility Elements --------------------------------------
 
-    // Refreashes the page 
+    // Refreshes the page 
     const refreshPage = () => {
         // Refreash page key
         setRefreshKey((prevKey) => prevKey + 1); 
@@ -102,25 +78,14 @@ export default function Dashboard() {
 
     
     const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
+
     // ------------------------- Keyboard shortcuts -------------------------
     
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-
-            if (event.key.toLowerCase() === 'r') {
-                router.push('/requests');
-            }
-        };
-        // EventListener is needed for keydown events
-        document.addEventListener('keydown', handleKeyPress);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [router]);
+    useKeyboardShortcuts();
 
 
     // ------------------------- Popup Close -------------------------
+
     useEffect(() => {
         // Check localStorage if the popup has been closed before
         const hasClosedPopup = localStorage.getItem('popupFlag');
@@ -130,79 +95,13 @@ export default function Dashboard() {
             setPopupFlag(false);
         }}, []);
 
-
-
     //----------------------------------- Filter Elements --------------------------------------------
 
-    // Toggles the state of the filters
-    const filterIntersections = () =>{
-        // Toggles true or false
-        setIsFiltering(!isFiltering) 
-    } 
+    const { filteredIntersections, filterOptions } = useIntersectionFilters(intersections);
 
-    // Handles filter options
-    const filterOptions = (selectedOption: string) => {
-        switch (selectedOption) {
-            
-            case 'Open':
-                // If blocked filter is not active
-                if(isFilterBlocked !== true || isFilterMaintenance !==true){
-                    // Toggle filter to open
-                    setIsFilterOpen(!isFilterOpen)
-                }
-                break;
-
-            case 'Blocked':
-                // If open filter is not active
-                if(isFilterOpen !== true || isFilterMaintenance !==true){
-                    // Toggles filter to blocked
-                    setIsFilterBlocked(!isFilterBlocked)
-                }
-                break;
-                    
-                case 'Maintenance':
-                if(isFilterOpen !== true || isFilterBlocked !== true){
-                    setIsFilterMaintenance(!isFilterMaintenance)
-                }
-                break;
-
-                case 'Operational':
-                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
-                    setIsFilterWorking(!isFilterWorking);
-                }
-                break;
-
-                case 'Inactive':
-                if (isFilterOpen !== true || isFilterBlocked !== true || isFilterMaintenance !== true) {
-                    setIsFilterNotWorking(!isFilterNotWorking);
-                }
-                break;
-
-            default:
-                console.warn(`Unknown filter option: ${selectedOption}`);
-                break;
-        }
+    const toggleFilterBar = () => {
+        setIsFiltering((prev) => !prev);
     };
-
-    // Filters intersections based on applied filters
-    const filteredIntersections = intersections.filter((item) => {
-        // Shows open intersections only if the filter is applied
-        if (isFilterOpen) return item.status === 'OPEN';
-
-        // Shows only blocked intersections if the filter is applied
-        if (isFilterBlocked) return item.status === 'BLOCKED';
-        
-        // Cameras under Maintenance
-        if (isFilterMaintenance) return item.status === 'MAINTENANCE';
-
-        // Cameras that have been updated within 10 minutes
-        if (isFilterWorking) return calculateDifferenceInMinutes(item.timestamp) < 10
-
-        // Cameras that have not been updated within 10 minutes
-        if (isFilterNotWorking) return calculateDifferenceInMinutes(item.timestamp) > 10
-
-        return true; // No filters applied
-    });
 
     // Updates # of intersections shown when filteredIntersections changes
     // setIntersectionsShown hook will run whenever filteredIntersections changes
@@ -233,7 +132,7 @@ export default function Dashboard() {
 
             <div className="filter">
                     {/* Toggle filter bar BUTTON */}
-                    <button onClick={filterIntersections} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
+                    <button onClick={toggleFilterBar} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
                     
                     {/* Shows # of filtered intersections */}
                     <div className='filter-2'>showing {intersectionsShown} intersections</div>
@@ -263,8 +162,7 @@ export default function Dashboard() {
                         <img src={item.imagepath} alt={item.name} />
                         <div className="name-reports-container">
                             <div className="item-name">{item.name}</div>
-                            <div className={getReportsForIntersection(item.id) >= 1 ? "item-reports" : "no-item-reports"} data-testid={"reports-amount-" + item.id}> 
-                                {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
+                            <div className={getReportsForIntersection(item.id, userFeedback, logs) >= 1 ? "item-reports" : "no-item-reports"}> {getReportsForIntersection(item.id, userFeedback, logs) >= 1 ? getReportsForIntersection(item.id, userFeedback, logs) : ""}</div>
                         </div>
                     </div>
                 <div className="item-info-container">
