@@ -1,6 +1,8 @@
 'use client';
+// faMoon for dark theme toggle button
+import { faFilter, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+//import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useIntersections } from "../hooks/useIntersections";
 import { useUserFeedback } from '../hooks/useUserFeedback';
@@ -35,6 +37,9 @@ export default function Dashboard() {
     const [isShortcutTabExpanded, setIsShortcutTabExpanded] = useState(false);
     // Flag that controls popup visibility
     const [popupFlag, setPopupFlag] = useState(true);
+    // Dark theme state
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
+
 
 
 
@@ -130,7 +135,41 @@ export default function Dashboard() {
             setPopupFlag(false);
         }}, []);
 
+    // -------------------------- Dark Theme --------------------------
+    
+    // ---------------- Set Theme --------------
+    useEffect(() => {
+        // Check localStorage if the theme was set previously 
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            setIsDarkTheme(true);
+            // Apply dark theme to body element
+            // Might need to further specify additions if colors beyond background body are to be changed
+            document.body.classList.add('dark-theme'); // Apply dark theme to body
+        } else {
+            setIsDarkTheme(false); // Regular Theme
+            document.body.classList.remove('dark-theme'); // Remove dark theme from body
+        }
+        // Empty array below makes sure this runs only on 1st load
+    }, []);
 
+    // --------------- Toggle Theme ------------
+    const toggleTheme = () => {
+        // Toggles dark theme on or off
+        const newTheme = !isDarkTheme;
+        setIsDarkTheme(newTheme);
+
+        // Saves the current theme to local storage
+        localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+
+        // If theme changes, apply it
+        if (newTheme) {
+            document.body.classList.add('dark-theme');
+        } else {
+            // If the theme isnt dark, remove dark theme from page body
+            document.body.classList.remove('dark-theme');
+        }
+    };
 
     //----------------------------------- Filter Elements --------------------------------------------
 
@@ -229,8 +268,13 @@ export default function Dashboard() {
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
                 {/* Refresh page BUTTON */}
                 <button onClick={refreshPage} className='refresh-button' data-testid="refresh-button"><FontAwesomeIcon icon={faArrowsRotate}/></button>
+                {/* Dark theme toggle BUTTON */}
+                <button onClick={toggleTheme} className="theme-toggle-button"><FontAwesomeIcon icon={faMoon} /> {/* Moon icon for dark theme */}
+                </button>
+            
             </div>
 
+            
             <div className="filter">
                     {/* Toggle filter bar BUTTON */}
                     <button onClick={filterIntersections} className='filter-1 shadow'><FontAwesomeIcon icon={faFilter}/> Filter</button>
@@ -267,17 +311,23 @@ export default function Dashboard() {
                                 {getReportsForIntersection(item.id) >= 1 ? getReportsForIntersection(item.id) : ""}</div>
                         </div>
                     </div>
+
                 <div className="item-info-container">
+
                     <div className="item-last-update">
                         <span>Last Update | </span> {calculateDifferenceInMinutes(item.timestamp)} minutes ago
                     </div>
+
                     <div className="item-status">
                         <span>Image Classification | </span> {item.status}
                     </div>
+
                     <div className="item-down">
                         <span>Camera Status | </span> {calculateDifferenceInMinutes(item.timestamp) < 10 ? "Working" : "Not Working"}
                     </div>
+
                 </div>
+
                 <div
                     className={
                         item.status === "MAINTENANCE" ? "maintenance-indicator" :calculateDifferenceInMinutes(item.timestamp) < 10 ? "good-indicator" : "bad-indicator"
