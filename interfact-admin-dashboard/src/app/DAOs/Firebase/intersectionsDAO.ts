@@ -1,4 +1,4 @@
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, updateDoc } from "firebase/firestore";
 import { dbFB } from "../../../../FirebaseConfig";
 import { Intersection } from "../../types/Firebase/intersectionTypeFB";
 
@@ -27,3 +27,21 @@ export const getIntersectionsFB = (callback: (data: Intersection[]) => void) => 
 
     return unsubscribe;
 };
+
+export const deleteFromDB = async (logid : string) => {
+    // Directly calls Firebase, so it should be extracted
+    const usersRef = collection(dbFB, 'users');
+    const snapshot = await getDocs(usersRef);
+
+    const updates = snapshot.docs.map(async (docSnap) => {
+        const userData = docSnap.data();
+        if (Array.isArray(userData.reports)) {
+            const filteredReports = userData.reports.filter(report => String(report) !== String(logid));
+
+            if (filteredReports.length !== userData.reports.length) { 
+                return updateDoc(docSnap.ref, { reports: filteredReports });
+            }
+        }
+    });
+    await Promise.all(updates);
+}

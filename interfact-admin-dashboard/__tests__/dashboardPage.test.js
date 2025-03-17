@@ -7,6 +7,9 @@ import { useUserFeedback } from '../src/app/hooks/useUserFeedback';
 import { describe } from 'node:test';
 import { useLogs } from '../src/app/hooks/useLogs.ts';
 import { main } from 'ts-node/dist/bin';
+import { expect } from '@jest/globals';
+import { mockLogs, mockUserFeedback, usedLogIds, mockIntersections } from '../__mocks__/mockData.ts';
+import { DateTime } from 'luxon';
 
 // Mock useRouter:
 const mockPush = jest.fn();
@@ -38,27 +41,33 @@ global.fetch = jest.fn(() =>
   }),
 )
 
+jest.spyOn(DateTime, 'now');
+DateTime.now.mockImplementation(() => DateTime.fromFormat(
+  "November 27, 2024 at 04:18:09PM UTC-4",
+  "MMMM d',' yyyy 'at' hh':'mm':'ssa 'UTC'Z", 
+  { zone: "UTC-4" }
+));
 
 const filterIntersectionData = [
   {
     id: '1',
     name: 'Intersection 1',
     status: 'OPEN',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 27, 2024 at 04:17:00PM UTC-4",
     imagepath: '/image1.jpg',
   },
   {
     id: '2',
     name: 'Intersection 2',
     status: 'BLOCKED',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 25, 2024 at 04:17:00PM UTC-4",
     imagepath: '/image2.jpg',
   },
   {
     id: '3',
     name: 'Intersection 3',
     status: 'MAINTENANCE',
-    timestamp: new Date().toISOString(),
+    timestamp: "November 27, 2024 at 04:17:16PM UTC-4",
     imagepath: '/image3.jpg'
   }
 ];
@@ -126,49 +135,60 @@ describe('Default dashboard', () => {
 
     expect(intersectionList).toBeInTheDocument();
   });
+  
+ });
 
 
+ 
+
+describe('Reports', () => {
   it('displays the total number of problems reported in the last 30 days', () => {
     useIntersections.mockReturnValue([]);
-    const userFeedbackData = [
-      { reports: [{ logid: '1' }, { logid: '2' }] },
-      { reports: [{ logid: '3' }] },
-      { reports: [] },
-    ];
-    const logdata = [
-      {
-        logid: '1',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '2',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '3',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-      {
-        logid: '4',
-        cameraid: "", timestamp: "", filename: "",
-        status: "", path: ""
-      },
-    ]
-    useUserFeedback.mockReturnValue(userFeedbackData);
-    useLogs.mockReturnValue(logdata);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
     
     render(<Home />);
   
     const problemsReportedText = screen.getByTestId("reports-amount");
     
     expect(problemsReportedText).toBeInTheDocument();
-    expect(problemsReportedText.textContent).toBe("3");
+    expect(problemsReportedText.textContent).toBe("5");
   });
+
+  it('displays the number of reports on an intersection', () => {
+    useIntersections.mockReturnValue(mockIntersections);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
+    
+    render(<Home />);
   
- });
+    const problemsReportedText = screen.getByTestId("reports-amount-TEST2");
+    
+    expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("1");
+  });
+
+  it('displays no report number if intersection has none', () => {
+    useIntersections.mockReturnValue([{
+      id: 'fakeIntersection',
+      name: 'Road',
+      imagepath: '/test.png',
+      latitude: 324,
+      longitude: 865,
+      status: "blocked",
+      timestamp: 2354252,
+  }]);
+    useUserFeedback.mockReturnValue(mockUserFeedback);
+    useLogs.mockReturnValue({logs: mockLogs, loading: false, error: null});
+    
+    render(<Home />);
+  
+    const problemsReportedText = screen.getByTestId("reports-amount-fakeIntersection");
+    
+    expect(problemsReportedText).toBeInTheDocument();
+    expect(problemsReportedText.textContent).toBe("");
+  });
+});
 
 function setUpForFilters() {
   useIntersections.mockReturnValue(filterIntersectionData);
@@ -207,13 +227,13 @@ describe("Dashboard filters", () => {
     setUpForFilters();
 
     // Select BLOCKED filter
-    const openFilterOption = screen.getByText((content, element) => {
+    const blockedFilterOption = screen.getByText((content, element) => {
       return (
         content === 'BLOCKED' &&
         element.className.includes('filter-option-blocked')
       );
     });
-    fireEvent.click(openFilterOption);
+    fireEvent.click(blockedFilterOption);
 
     // Verify that only BLOCKED status intersection is displayed
     expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
@@ -225,13 +245,13 @@ describe("Dashboard filters", () => {
     setUpForFilters();
 
     // Select UNDER_MAINTENANCE filter
-    const openFilterOption = screen.getByText((content, element) => {
+    const maintFilterOption = screen.getByText((content, element) => {
       return (
         content === 'UNDER MAINTENANCE' &&
         element.className.includes('filter-option-maintenance')
       );
     });
-    fireEvent.click(openFilterOption);
+    fireEvent.click(maintFilterOption);
 
     // Verify that only UNDER_MAINTENANCE status intersection is displayed
     expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
@@ -262,6 +282,70 @@ describe("Dashboard filters", () => {
     expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
     expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
   });
+
+  it('removes filters when refresh button pressed', () => {
+    setUpForFilters();
+
+    // Select OPEN filter using a custom matcher
+    const openFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'OPEN' &&
+        element.className.includes('filter-option-open')
+      );
+    });
+    fireEvent.click(openFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
+
+    //Hit refresh
+    const refreshButton = screen.getByTestId("refresh-button");
+    fireEvent.click(refreshButton);
+
+    // Expect all intersections to be in doc
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
+
+  });
+
+  it("shows only operational intersections for working filter", () => {
+    setUpForFilters();
+
+    const workingFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'WORKING' &&
+        element.className.includes('filter-option-working')
+      );
+    });
+    fireEvent.click(workingFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.getByText(filterIntersectionData[0].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[1].name)).not.toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[2].name)).toBeInTheDocument();
+  });
+
+  it("shows only broken intersections for inactive filter", () => {
+    setUpForFilters();
+
+    // Select OPEN filter using a custom matcher
+    const brokenFilterOption = screen.getByText((content, element) => {
+      return (
+        content === 'INACTIVE' &&
+        element.className.includes('filter-option-inactive')
+      );
+    });
+    fireEvent.click(brokenFilterOption);
+
+    // Verify that only OPEN status intersection is displayed
+    expect(screen.queryByText(filterIntersectionData[0].name)).not.toBeInTheDocument();
+    expect(screen.getByText(filterIntersectionData[1].name)).toBeInTheDocument();
+    expect(screen.queryByText(filterIntersectionData[2].name)).not.toBeInTheDocument();
+  });
+
  });
 
 
@@ -282,6 +366,24 @@ describe("Dashboard navigation", () => {
     fireEvent.click(mapViewButton);
 
     expect(window.open).toHaveBeenCalledWith('https://interfact.live/map', '_blank');
+  });
+
+  it('navigates to request when r is pressed', () => {
+      render(<Home />);
+
+      fireEvent.keyDown(document, {key: 'r'});
+      expect(mockPush).toHaveBeenCalledWith('/requests')
+  });
+
+  it('navigates to the correct intersection', () => {
+      useIntersections.mockReturnValue(mockIntersections);
+
+      render(<Home />);
+
+      const intersectionOne = screen.getByText(mockIntersections[0].name);
+      fireEvent.click(intersectionOne);
+
+      expect(mockPush).toHaveBeenCalledWith('/Intersection/' +mockIntersections[0].id);
   });
 
  });
