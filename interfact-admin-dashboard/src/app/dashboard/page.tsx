@@ -127,7 +127,7 @@ export default function Dashboard() {
                 {/* Open map view BUTTON */}
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
                 {/* Refresh page BUTTON */}
-                <button onClick={refreshPage} className='refresh-button'><FontAwesomeIcon icon={faArrowsRotate}/></button>
+                <button onClick={refreshPage} className='refresh-button' data-testid="refresh-button"><FontAwesomeIcon icon={faArrowsRotate}/></button>
             </div>
 
             <div className="filter">
@@ -147,7 +147,7 @@ export default function Dashboard() {
                 <div onClick={() => filterOptions("Open")} className={isFilterOpen === false ? 'filter-option-open': 'filter-option-open-selected'}>OPEN</div>
                 <div onClick={() => filterOptions("Blocked")} className={isFilterBlocked === false ? 'filter-option-blocked': 'filter-option-blocked-selected'}>BLOCKED</div>
                 <div onClick={() => filterOptions("Maintenance")} className={isFilterMaintenance === false ? 'filter-option-maintenance': 'filter-option-maintenance-selected'}>UNDER MAINTENANCE</div>
-                <div onClick={() => filterOptions("Working")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
+                <div onClick={() => filterOptions("Operational")} className={isFilterWorking === false ? 'filter-option-working' : 'filter-option-working-selected'}>WORKING</div>
                 <div onClick={() => filterOptions("Inactive")} className={isFilterNotWorking === false ? 'filter-option-inactive' : 'filter-option-inactive-selected'}>INACTIVE</div>
 
                 </div>
