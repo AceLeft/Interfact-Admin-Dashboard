@@ -1193,3 +1193,33 @@ body {
   text-align: center;
 }
 
+.transition{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  pointer-events: none;
+}
+.transition-row{
+  flex: 1;
+  display: flex;
+}
+
+.transition-row.row-1 .block{
+  transform-origin: top;
+}
+
+.transition-row.row-2 .block{
+  transform-origin: bottom;
+}
+
+.block{
+  flex: 1;
+  background-color: #72f86d;
+  transform: scaleY(1);
+  will-change: transform;
+}
