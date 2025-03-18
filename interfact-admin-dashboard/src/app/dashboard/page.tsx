@@ -147,10 +147,10 @@ export default function Dashboard() {
             // Might need to further specify additions if colors beyond background body are to be changed
             document.body.classList.add('dark-theme'); // Apply dark theme to body
         } else {
-            setIsDarkTheme(false); // Regular Theme
-            document.body.classList.remove('dark-theme'); // Remove dark theme from body
+            setIsDarkTheme(false); // aka regular theme
+            document.body.classList.remove('dark-theme'); // Remove dark theme from body element
         }
-        // Empty array below makes sure this runs only on 1st load
+        // Empty array below makes sure this runs on load
     }, []);
 
     // --------------- Toggle Theme ------------
