@@ -13,6 +13,9 @@ import { Log } from '@/app/types/Firebase/LogMySql';
 import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
 import { calculateAverageBlockageTime } from '@/app/utils/calculateAverageBlockageTime';
 import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
+import { confirmReport } from '@/app/utils/intersection/confirmReport';
+import { denyReport } from '@/app/utils/intersection/denyReport';
+import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
 
 
 const LOGS_PER_PAGE = 250;
@@ -95,66 +98,8 @@ const IntersectionPage = () => {
     }
   }, [userFeedback, logs]);
 
-  const confirmReport = async (url: string, logID: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === "BLOCKED" ? "OPEN" : "BLOCKED";
-      const updateStatusResponse = await fetch('/api/logs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logid: logID, status: newStatus }),
-      });
+ 
 
-      const updateStatusData = await updateStatusResponse.json();
-
-      if (updateStatusResponse.ok) {
-        console.log(`Status updated to ${newStatus} for logID: ${logID}`);
-      } else {
-        console.error("Error updating status:", updateStatusData.message);
-        return;
-      }
-
-      deleteFromDB(logID);
-
-
-      const confirmResponse = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      });
-
-      const confirmData = await confirmResponse.json();
-
-      if (!confirmResponse.ok) {
-        console.error("Error confirming report:", confirmData.message);
-      }
-    } catch (error) {
-      console.error('Request failed:', error);
-    }
-  };
-
-  const denyReport = async (logID: string) => {
-    try {
-      deleteFromDB(logID);
-    } catch (error) {
-      console.error('Error removing report:', error);
-    }
-  };
-
-  const getTimeColor = (score: number): string => {
-    if (score <= 1) return 'green';
-    switch (score) {
-      case 2: return '#FA9E9E';
-      case 3: return '#F87777';
-      case 4: return '#F76464';
-      case 5: return '#F65151';
-      case 6: return '#F53D3D';
-      case 7: return '#F42A2A';
-      case 8: return '#F31616';
-      case 9: return '#E90C0C';
-      case 10: return '#C20A0A';
-      default: return 'green';
-    }
-  };
 
   // Filter logs for the current intersection
   const filteredLogs = intersection ? logs.filter(log => log.cameraid === intersection.id) : [];
