@@ -8,6 +8,7 @@ import { useLogs } from '../hooks/useLogs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "../utils/dashboard/timeCaculator";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 
 
 export default function Dashboard() {
@@ -104,21 +105,7 @@ export default function Dashboard() {
     const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
     // ------------------------- Keyboard shortcuts -------------------------
     
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-
-            if (event.key.toLowerCase() === 'r') {
-                router.push('/requests');
-            }
-        };
-        // EventListener is needed for keydown events
-        document.addEventListener('keydown', handleKeyPress);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [router]);
-
+    useKeyboardShortcuts();
 
     // ------------------------- Popup Close -------------------------
     useEffect(() => {
