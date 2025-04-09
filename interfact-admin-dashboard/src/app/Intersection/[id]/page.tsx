@@ -156,7 +156,8 @@ const IntersectionPage = () => {
                         </button>
                       </div>
                       <div className="report-img">
-                        <img src={`/report-check/reported-images/${logItem?.filename}`} alt="" />
+                        {/* logItem path is local to DB. Pull in image from computer*/}
+                        <img src={`${process.env.ROOT_IMAGE_DIR}${logItem?.path}${logItem?.filename}`} alt="" />
                       </div>
                     </div>
                   </div>
