@@ -1,7 +1,8 @@
 import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
 
 export const confirmReport = async (
-  fileAddress: string,
+  fileName: string,
+  path: string,
   logID: string,
   currentStatus: string
 ): Promise<void> => {
@@ -27,7 +28,7 @@ export const confirmReport = async (
     const confirmResponse = await fetch('/api/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filePath: fileAddress }),
+      body: JSON.stringify({ filePath: path, fileName: fileName }),
     });
 
     const confirmData = await confirmResponse.json();

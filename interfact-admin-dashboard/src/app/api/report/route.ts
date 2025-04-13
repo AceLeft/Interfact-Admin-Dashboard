@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
-const newFolderName = "training-base-sets"
-const initialFolderName = "detected"
 
 type FilePostProps = {
   fileName: string
@@ -14,25 +12,19 @@ export async function POST(request: Request) {
   try {
     const { fileName, filePath } : FilePostProps = await request.json();
 
+    // Correct the filepath (expected to be ./detected/ID/....)
+    const correctedFilePath = path.join(process.cwd(), 'public', 'report-check', filePath, fileName);
     
-    const addressParts = filePath.split("/");
-    const oldFolderIndex = addressParts.indexOf(initialFolderName);
-    if (oldFolderIndex == -1){
-      throw "ERROR! Expected file location not found. Please check formatting or change expected value"
+    
+    let newPath = filePath.replace("no", "with");
+    if (newPath == filePath){
+      newPath = filePath.replace("with", "no");
     }
-    addressParts[oldFolderIndex] = newFolderName;
+    newPath = newPath.replace("detected", "training-base-sets")
 
-    // The final folder (ex dark-with-train) is expected to be to be last in filePath
-    const oldReportTypeFolder = addressParts[addressParts.length - 1]
-    let newReportTypeFolder = oldReportTypeFolder.replace("no", "with");
-    if (newReportTypeFolder == oldReportTypeFolder){
-      newReportTypeFolder = oldReportTypeFolder.replace("with", "no");
-    }
-    addressParts[addressParts.length - 1] = newReportTypeFolder;
+    const finalFullPath =  path.join(process.cwd(), 'public', 'report-check', newPath, fileName);
 
-    const newPath = addressParts.join("/") + "/" + fileName;
-
-    fs.renameSync(filePath, newPath);
+    fs.renameSync(correctedFilePath, finalFullPath);
 
     return NextResponse.json({ success: true, message: 'File moved successfully!' });
   } catch (err) {

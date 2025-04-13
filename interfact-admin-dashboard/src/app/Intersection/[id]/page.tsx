@@ -98,7 +98,6 @@ const IntersectionPage = () => {
     }
   }, [userFeedback, logs]);
 
- 
 
 
   // Filter logs for the current intersection
@@ -148,7 +147,7 @@ const IntersectionPage = () => {
                     <div className='report-buttons-text'>Confirm or deny report:</div>
                     <div className="report-container2">
                       <div className='report-buttons'>
-                        <button className='report-positive' onClick={() => logItem?.filename ? confirmReport(logItem.filename, logItem.logid, logItem.status) : console.warn("Filename is undefined")} data-testid="confirm">
+                        <button className='report-positive' onClick={() => logItem?.filename ? confirmReport(logItem.filename, logItem.path, logItem.logid, logItem.status) : console.warn("Filename is undefined")} data-testid="confirm">
                           <FontAwesomeIcon icon={faThumbsUp} />
                         </button>
                         <button className='report-negative' onClick={() => logItem?.logid ? denyReport(logItem.logid) : console.warn("Filename is undefined")} data-testid="deny">
@@ -156,8 +155,8 @@ const IntersectionPage = () => {
                         </button>
                       </div>
                       <div className="report-img">
-                        {/* logItem path is local to DB. Pull in image from computer*/}
-                        <img src={`${process.env.ROOT_IMAGE_DIR}${logItem?.path}${logItem?.filename}`} alt="" />
+                        {/* logItem path is local to DB. Add directory from computer*/}
+                        <img src={`${process.env.NEXT_PUBLIC_ROOT_IMAGE_DIR}${logItem?.path.replace("./", "/")}${logItem?.filename}`} alt="train" />
                       </div>
                     </div>
                   </div>
