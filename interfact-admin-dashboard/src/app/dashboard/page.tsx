@@ -11,6 +11,7 @@ import calculateDifferenceInMinutes from "../utils/dashboard/timeCaculator";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 
 
+
 export default function Dashboard() {
 
     //------------------------------ Hooks -----------------------------
@@ -94,12 +95,16 @@ export default function Dashboard() {
     // Navigate to intersection page by the intersection id
     const navToIntersectionPage = (id: string) =>{
         router.push(`/Intersection/${id}`)
-    }
+    };
 
     // Redirect component to Interfact.live
     const interfactLiveRedirect = () => {
         window.open('https://interfact.live/map', '_blank');
-      };
+    };
+
+    const retrainData = async () => { 
+        await fetch('/api/python', { method: 'GET',});
+    }
 
     
     const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
@@ -216,6 +221,8 @@ export default function Dashboard() {
                 <button onClick={interfactLiveRedirect} className='map-view'>Map View</button>
                 {/* Refresh page BUTTON */}
                 <button onClick={refreshPage} className='refresh-button' data-testid="refresh-button"><FontAwesomeIcon icon={faArrowsRotate}/></button>
+
+                <button onClick={retrainData}>Retrain data</button>
             </div>
 
             <div className="filter">
