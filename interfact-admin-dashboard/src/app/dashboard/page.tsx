@@ -102,9 +102,6 @@ export default function Dashboard() {
         window.open('https://interfact.live/map', '_blank');
     };
 
-    const retrainData = async () => { 
-        await fetch('/api/python', { method: 'GET',});
-    }
 
     
     const tabToggle = () => setIsShortcutTabExpanded(!isShortcutTabExpanded);
@@ -222,7 +219,7 @@ export default function Dashboard() {
                 {/* Refresh page BUTTON */}
                 <button onClick={refreshPage} className='refresh-button' data-testid="refresh-button"><FontAwesomeIcon icon={faArrowsRotate}/></button>
 
-                <button onClick={retrainData}>Retrain data</button>
+                
             </div>
 
             <div className="filter">
