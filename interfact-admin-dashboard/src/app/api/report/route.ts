@@ -2,14 +2,29 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
+
+type FilePostProps = {
+  fileName: string
+  filePath: string
+}
+
 export async function POST(request: Request) {
   try {
-    const { url } = await request.json();
+    const { fileName, filePath } : FilePostProps = await request.json();
 
-    const oldPath = path.join(process.cwd(), 'public', 'report-check', 'reported-images', url);
-    const newPath = path.join(process.cwd(), 'public', 'report-check', 'confirmed-images', url);
+    // Correct the filepath (expected to be ./detected/ID/....)
+    const correctedFilePath = path.join(process.cwd(), 'public', 'report-check', filePath, fileName);
+    
+    
+    let newPath = filePath.replace("no", "with");
+    if (newPath == filePath){
+      newPath = filePath.replace("with", "no");
+    }
+    newPath = newPath.replace("detected", "training-base-sets")
 
-    fs.renameSync(oldPath, newPath);
+    const finalFullPath =  path.join(process.cwd(), 'public', 'report-check', newPath, fileName);
+
+    fs.renameSync(correctedFilePath, finalFullPath);
 
     return NextResponse.json({ success: true, message: 'File moved successfully!' });
   } catch (err) {

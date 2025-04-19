@@ -16,6 +16,7 @@ import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
 import { confirmReport } from '@/app/utils/intersection/confirmReport';
 import { denyReport } from '@/app/utils/intersection/denyReport';
 import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
+import { ReportComponent } from './reportComponent';
 
 
 const LOGS_PER_PAGE = 250;
@@ -91,6 +92,11 @@ const IntersectionPage = () => {
     });
   };
 
+  const retrainData = async () => { 
+    await fetch('/api/python', { method: 'GET',});
+  };
+
+
 
   useEffect(() => {
     if (userFeedback.length > 0 && logs.length > 0) {
@@ -98,7 +104,6 @@ const IntersectionPage = () => {
     }
   }, [userFeedback, logs]);
 
- 
 
 
   // Filter logs for the current intersection
@@ -131,41 +136,13 @@ const IntersectionPage = () => {
             reports.map((report : string, index) => {
               const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
               return (
-                <div key={`${report}-${index}`} data-testid="report">
-                  <div className='report-container'>
-                    {logItem ? (
-                      <div className='report-item-1'>
-                        <div className="log-row"><span className="log-label">Log ID:</span> {logItem.logid}</div>
-                        <div className="log-row"><span className="log-label">Camera ID:</span> {logItem.cameraid}</div>
-                        <div className="log-row"><span className="log-label">Timestamp:</span> {new Date(logItem.timestamp).toLocaleString()}</div>
-                        <div className="log-row"><span className="log-label">Filename:</span> {logItem.filename}</div>
-                        <div className="log-row"><span className="log-label">Status:</span> {logItem.status}</div>
-                        <div className="log-row"><span className="log-label">Path:</span> {logItem.path}</div>
-                      </div>
-                    ) : (
-                      <p style={{ color: 'red' }}>No matching log found for logID: {report}</p>
-                    )}
-                    <div className='report-buttons-text'>Confirm or deny report:</div>
-                    <div className="report-container2">
-                      <div className='report-buttons'>
-                        <button className='report-positive' onClick={() => logItem?.filename ? confirmReport(logItem.filename, logItem.logid, logItem.status) : console.warn("Filename is undefined")} data-testid="confirm">
-                          <FontAwesomeIcon icon={faThumbsUp} />
-                        </button>
-                        <button className='report-negative' onClick={() => logItem?.logid ? denyReport(logItem.logid) : console.warn("Filename is undefined")} data-testid="deny">
-                          <FontAwesomeIcon icon={faThumbsDown} />
-                        </button>
-                      </div>
-                      <div className="report-img">
-                        <img src={`/report-check/reported-images/${logItem?.filename}`} alt="" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ReportComponent report={report} logItem={logItem} index={index}></ReportComponent>
               );
             })
           ) : (
             <p>No reports found for this intersection.</p>
           )}
+          <button onClick={retrainData}>Retrain data</button>
         </div>
         <div className='intersection-logs shadow'>
           <h1>Camera Logs</h1>
