@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { useLogs } from '@/app/hooks/useLogs';
-import { calculateHourlyScores, HourlyScores } from '@/app/utils/calculateHourlyScores';
 import { Log } from '@/app/types/Firebase/LogMySql';
 import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
 import { calculateAverageBlockageTime } from '@/app/utils/calculateAverageBlockageTime';
@@ -17,6 +16,12 @@ import { confirmReport } from '@/app/utils/intersection/confirmReport';
 import { denyReport } from '@/app/utils/intersection/denyReport';
 import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
 import { ReportComponent } from './reportComponent';
+import { PercentChartHour } from '@/components/PercentChartHour';
+import { PercentChartDay } from '@/components/PercentChartDay';
+
+import { Switch } from "@/components/ui/switch"
+
+
 
 
 const LOGS_PER_PAGE = 250;
@@ -27,7 +32,6 @@ const IntersectionPage = () => {
   const { logs, loading, error } = useLogs();
   const params = useParams();
   const [reports, setReports] = useState<string[] | null>([]);
-  const [hourlyScores, setHourlyScores] = useState<HourlyScores>({});
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
   const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
   const [intersection, setIntersection] = useState<Intersection | null>(null);
@@ -35,6 +39,7 @@ const IntersectionPage = () => {
   const [blockedDayTime, setBlockedDayTime] = useState<number>(1);
   const [blockedWeekTime, setBlockedWeekTime] = useState<number>(1);
   const [avgBlockTime, setAvgBlockTime] = useState<number>(1);
+  const [chartVersionPercent, setChartVersionPercent] = useState<boolean>(true);
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -47,12 +52,6 @@ const IntersectionPage = () => {
     }
   }, [id, intersections]);
 
-  useEffect(() => {
-    if (logs.length > 0 && intersection) {
-      const scores: HourlyScores = calculateHourlyScores(logs, intersection.id);
-      setHourlyScores(scores);
-    }
-  }, [logs, intersection]);
 
   useEffect(() => {
     if (logs.length > 0 && intersection) {
@@ -198,95 +197,11 @@ const IntersectionPage = () => {
             <div className='total-block-time'><h1>Total Time Blocked (Last Week):</h1> <h2>{blockedWeekTime} minutes</h2></div>
         </div>
         <div className='log-time-prediction shadow' style={{ position: 'relative' }}>
-          {(() => {
-            const times = [
-              "12:00", "1:00", "2:00", "3:00", "4:00", "5:00",
-              "6:00", "7:00", "8:00", "9:00", "10:00", "11:00"
-            ];
-            return (
-              <>
-              <div className="score-display">
-                  {hoveredHour !== null && hourlyScores[hoveredHour] !== undefined ? (
-                    <p>
-                      {hoveredHour < 12 ? times[hoveredHour] : times[hoveredHour - 12]}{" "}
-                      {hoveredHour < 12 ? "AM" : "PM"} has a blocked score of [ {hourlyScores[hoveredHour]} ]
-                    </p>
-                  ) : (
-                    <p>&nbsp;</p>
-                  )}
-                </div>
-                <div className="time-container">
-                  <div className='time-am'>
-                    <div className="times-row">
-                      {times.map((time, idx) => {
-                        const actualHour = idx + 12;
-                        const minHeight = 55;
-                        const maxHeight = 230;
-                        const score = hourlyScores[actualHour];
-                        const normalizedHeight = minHeight + (score / 9) * (maxHeight - minHeight);
-                        const heightPx = `${normalizedHeight}px`;
-                        return (
-                          <div
-                            key={`pm-${time}`}
-                            className="time"
-                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("PM"); }}
-                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
-                            style={{
-                              borderColor: hourlyScores[actualHour] !== undefined
-                                ? getTimeColor(hourlyScores[actualHour])
-                                : 'inherit',
-                              height: hourlyScores[actualHour] !== undefined
-                              ? heightPx
-                              : 'auto'
-                            }}>
-                            <div className='time-text'>
-                              <strong>{time}</strong>
-                              <strong>PM</strong>
-                            </div>
-                          </div>
-                        );
-                      })}
-                      <div className='separate-bar'></div>
-                      {times.map((time, idx) => {
-                        const actualHour = idx;
-                        const minHeight = 55;
-                        const maxHeight = 230;
-                        const score = hourlyScores[actualHour];
-                        const normalizedHeight = minHeight + (score / 9) * (maxHeight - minHeight);
-                        const heightPx = `${normalizedHeight}px`;
-                        return (
-                          <div
-                            key={`am-${time}`}
-                            className="time"
-                            onMouseEnter={() => { setHoveredHour(actualHour); setHoveredPeriod("AM"); }}
-                            onMouseLeave={() => { setHoveredHour(null); setHoveredPeriod(null); }}
-                            style={{
-                              borderColor: hourlyScores[actualHour] !== undefined
-                                ? getTimeColor(hourlyScores[actualHour])
-                                : 'inherit',
-                              height: hourlyScores[actualHour] !== undefined
-                                ? heightPx
-                                : 'auto'
-                            }}>
-                            <div className='time-text'>
-                              <strong>{time}</strong>
-                              <strong>AM</strong>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="time-pm">
-                    <div className="times-row">
-                      
-                    </div>
-                  </div>
-                </div>
-                
-              </>
-            );
-          })()}
+            {chartVersionPercent == true ? <h1>Hourly Blocked Percentage</h1> : <h1>Daily Blocked Percentage</h1>}
+            <Switch checked={chartVersionPercent} onCheckedChange={setChartVersionPercent}/>
+
+
+          {chartVersionPercent == true ? <PercentChartHour logs={logs} intersectionId={intersection ? intersection.id: ''}/> : <PercentChartDay logs={logs} intersectionId={intersection ? intersection.id: ''}/>}
         </div>
       </div>
     </div>
