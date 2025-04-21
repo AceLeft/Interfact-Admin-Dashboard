@@ -1,13 +1,17 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useIntersections } from "../hooks/useIntersections";
+import { animateToPage, isPageAnimating } from '@/app/transition';
 export default function Cities() {
 
     const router = useRouter();
+    const pathname = usePathname();
     const intersectionCount = useIntersections()
 
     const toCityDashboard = () =>{
-        router.push("/dashboard")
+        if (isPageAnimating()) return;
+
+         animateToPage(router, '/dashboard', pathname);
     }
 
     return (
