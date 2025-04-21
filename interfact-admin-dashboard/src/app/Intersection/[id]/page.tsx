@@ -5,8 +5,9 @@ import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
+import { faScrewdriverWrench, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useLogs } from '@/app/hooks/useLogs';
 import { Log } from '@/app/types/Firebase/LogMySql';
 import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
@@ -18,18 +19,19 @@ import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
 import { ReportComponent } from './reportComponent';
 import { PercentChartHour } from '@/components/PercentChartHour';
 import { PercentChartDay } from '@/components/PercentChartDay';
+import { usePercentChartDataDaily } from '@/app/hooks/usePercentChartDataDaily';
+import { usePercentChartDataHourly } from '@/app/hooks/usePercentChartDataHourly';
 
 import { Switch } from "@/components/ui/switch"
-
-
-
+import { UploadSnapButton } from '@/components/UploadSnapButton';
 
 const LOGS_PER_PAGE = 250;
 
 const IntersectionPage = () => {
   const userFeedback = useUserFeedback();
   const intersections = useIntersections();
-  const { logs, loading, error } = useLogs();
+  const { logs, loading, error, refetch } = useLogs();
+
   const params = useParams();
   const [reports, setReports] = useState<string[] | null>([]);
   const [hoveredHour, setHoveredHour] = useState<number | null>(null);
@@ -41,7 +43,13 @@ const IntersectionPage = () => {
   const [avgBlockTime, setAvgBlockTime] = useState<number>(1);
   const [chartVersionPercent, setChartVersionPercent] = useState<boolean>(true);
 
+  const percentChartDataHourly = usePercentChartDataHourly(logs, intersection?.id || '');
+  const percentChartDataDaily = usePercentChartDataDaily(logs, intersection?.id || '');
+
+
+
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
 
   useEffect(() => {
     if (id) {
@@ -52,6 +60,11 @@ const IntersectionPage = () => {
     }
   }, [id, intersections]);
 
+
+  //Load data on mount
+  useEffect(() => {
+    refetch(); 
+  }, [refetch]);
 
   useEffect(() => {
     if (logs.length > 0 && intersection) {
@@ -110,6 +123,25 @@ const IntersectionPage = () => {
   const totalPages = Math.ceil(filteredLogs.length / LOGS_PER_PAGE);
   const currentLogs = filteredLogs.slice((currentPage - 1) * LOGS_PER_PAGE, currentPage * LOGS_PER_PAGE);
 
+  //Build snapshot payload
+  const snapshotChartData = {
+    hourly: percentChartDataHourly.map(({ hour, percent }) => ({
+      label: hour,
+      percent,
+    })),
+    daily: percentChartDataDaily.map(({ day, percent }) => ({
+      label: day,
+      percent,
+    })),
+  };
+  
+
+  console.log("📊 percentChartDataDaily raw:", percentChartDataDaily);
+
+
+
+
+
   return (
     <div>
       <div className='intersection-info'>
@@ -130,7 +162,12 @@ const IntersectionPage = () => {
       </div>
       <div className="intersection-info-2">
         <div className='intersection-reports shadow'>
-          <h1>Reports Received <span>{reports?.length || "-"}</span></h1>
+          <div className='intersection-reports-label'>
+            <div><h1>Reports Received <span>{reports?.length || "-"}</span></h1></div>
+            <div><button className='' onClick={retrainData}><FontAwesomeIcon icon={faScrewdriverWrench} className="text-xl text-muted-foreground text-white" /></button></div>
+          </div>
+          
+
           {reports && reports.length > 0 ? (
             reports.map((report : string, index) => {
               const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
@@ -141,7 +178,7 @@ const IntersectionPage = () => {
           ) : (
             <p>No reports found for this intersection.</p>
           )}
-          <button onClick={retrainData}>Retrain data</button>
+          
         </div>
         <div className='intersection-logs shadow'>
           <h1>Camera Logs</h1>
@@ -197,10 +234,22 @@ const IntersectionPage = () => {
             <div className='total-block-time'><h1>Total Time Blocked (Last Week):</h1> <h2>{blockedWeekTime} minutes</h2></div>
         </div>
         <div className='log-time-prediction shadow' style={{ position: 'relative' }}>
-            {chartVersionPercent == true ? <h1>Hourly Blocked Percentage</h1> : <h1>Daily Blocked Percentage</h1>}
-            <Switch checked={chartVersionPercent} onCheckedChange={setChartVersionPercent}/>
+          <div className='log-time-prediction-header'>
+            <div>{chartVersionPercent == true ? <h1>Hourly Blocked Percentage</h1> : <h1>Daily Blocked Percentage</h1>}</div>
+            <div><Switch checked={chartVersionPercent} onCheckedChange={setChartVersionPercent}/></div>
+            <div>
+              <button
+                onClick={refetch}
+                className='peer inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 bg-primary'>
+                <FontAwesomeIcon icon={faArrowsRotate} className="text-xl text-muted-foreground" />
+              </button>
+            </div>
+            <div>
+            <UploadSnapButton data={snapshotChartData} />
+            
 
-
+            </div>
+          </div>
           {chartVersionPercent == true ? <PercentChartHour logs={logs} intersectionId={intersection ? intersection.id: ''}/> : <PercentChartDay logs={logs} intersectionId={intersection ? intersection.id: ''}/>}
         </div>
       </div>

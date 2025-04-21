@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+
 import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(useGSAP);
@@ -25,6 +26,8 @@ export default function RootLayout({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  
 
   useGSAP(() => {
     if (!isMounted || isExcluded) return;
