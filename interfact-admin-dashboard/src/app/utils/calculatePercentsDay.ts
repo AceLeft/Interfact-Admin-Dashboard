@@ -2,30 +2,42 @@ import { Log } from "../types/Firebase/LogMySql";
 
 export interface DayDataPoint {
   day: string;
-  percent: number;
+  percent: number; 
 }
 
-const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export const calculatePercentsByDay = (
   logs: Log[],
   intersectionId: string
 ): DayDataPoint[] => {
-  const blockedCounts = Array(7).fill(0); // index 0 = Sunday
+  const blockedLogs = logs.filter(
+    (l) =>
+      String(l.cameraid).trim() === String(intersectionId).trim() &&
+      String(l.status).trim().toUpperCase() === "BLOCKED"
+  );
 
-  const filteredLogs = logs.filter((log) => log.cameraid === intersectionId);
-
-  filteredLogs.forEach((log) => {
-    if (log.status === "BLOCKED") {
-      const day = new Date(log.timestamp).getDay();
-      blockedCounts[day]++;
-    }
+  const blockedCounts = Array(7).fill(0);
+  blockedLogs.forEach((log) => {
+    const weekday = new Date(log.timestamp).getDay();
+    blockedCounts[weekday]++;
   });
 
-  const totalBlocked = blockedCounts.reduce((sum, count) => sum + count, 0);
+  const totalBlocked = blockedCounts.reduce((sum, c) => sum + c, 0);
 
-  return blockedCounts.map((count, dayIndex) => ({
-    day: daysOfWeek[dayIndex],
-    percent: totalBlocked === 0 ? 0 : parseFloat(((count / totalBlocked) * 100).toFixed(2)),
+  return daysOfWeek.map((dayName, idx) => ({
+    day: dayName,
+    percent:
+      totalBlocked === 0
+        ? 0
+        : parseFloat(((blockedCounts[idx] / totalBlocked) * 100).toFixed(2)),
   }));
 };

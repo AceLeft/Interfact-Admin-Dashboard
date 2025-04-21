@@ -6,7 +6,8 @@ export const usePercentChartDataDaily = (
   logs: Log[],
   intersectionId: string
 ): DayDataPoint[] => {
-  return useMemo(() => {
-    return calculatePercentsByDay(logs, intersectionId);
-  }, [logs, intersectionId]);
+  return useMemo(
+    () => calculatePercentsByDay(logs, intersectionId),
+    [logs, intersectionId]
+  );
 };

@@ -22,6 +22,10 @@
   }
 }
 
+::selection {
+  background-color: #00F704;    
+}
+
 body {
   background-color: #ebebeb;
   margin: 0;
@@ -624,7 +628,35 @@ body {
   flex-direction: column;
   font-family: 'outfit';
   transition: all .1s;
+  max-height: 580px; 
+  overflow-y: auto;
 }
+
+.intersection-reports-label{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.intersection-reports-label button{
+  width: 60px;
+  height: 30px;
+  border-radius: 25px;
+  background-color: #171717;
+  border: none;
+  cursor: pointer;
+}
+
+
+.intersection-reports::-webkit-scrollbar {
+  width: 8px;
+}
+
+.intersection-reports::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
 .intersection-reports p{
   margin-left: 25px;
   margin-bottom: 30px;
@@ -1050,6 +1082,12 @@ body {
   margin-left: 28px;
   justify-content: center;
   align-items: center;
+}
+
+.log-time-prediction-header{
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .time-container {
