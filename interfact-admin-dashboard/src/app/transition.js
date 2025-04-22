@@ -2,18 +2,20 @@ import gsap from 'gsap';
 
 const ease = 'power4.inOut';
 let isAnimating = false;
-let lastPath = ''; // Keep track of the last successful route change
+let lastNavigatedPath = ''; 
 
 export function isPageAnimating() {
   return isAnimating;
 }
 
-export function animateToPage(router, href, currentPathname) {
-  if (!href || href.startsWith('#') || isAnimating || href === currentPathname) return;
+export function runPageTransition(reset) {
+  if (isAnimating) return Promise.resolve(); 
 
   isAnimating = true;
 
   return new Promise((resolve) => {
+    if (reset === '/dashboard') lastNavigatedPath = '/dashboard';
+    else lastNavigatedPath = '';
     gsap.set('.block', { visibility: 'visible', scaleY: 0 });
     gsap.to('.block', {
       scaleY: 1,
@@ -25,16 +27,12 @@ export function animateToPage(router, href, currentPathname) {
         axis: 'x',
       },
       ease,
-      onComplete: () => {
-        lastPath = href; // Update last path AFTER animation completes
-        router.push(href);
-        resolve();
-      },
+      onComplete: resolve,
     });
   });
 }
 
-function revealTransition() {
+export function revealTransition() {
   return new Promise((resolve) => {
     gsap.set('.block', { scaleY: 1 });
     gsap.to('.block', {
@@ -63,22 +61,26 @@ export function setupPageTransitions({ router, pathname }) {
     const link = event.currentTarget;
     const href = link.getAttribute('href');
 
-    // Prevent animation on same page or during animation
-    if (!href || href.startsWith('#') || isAnimating || href === lastPath) {
+    if (
+      !href || href.startsWith('#') || href === pathname || href === lastNavigatedPath ||  isAnimating
+    ) {
       event.preventDefault();
       return;
     }
 
     event.preventDefault();
-    animateToPage(router, href, pathname);
+    
+    runPageTransition(false).then(() => {
+      router.push(href);
+      lastNavigatedPath = href;
+    });
   };
 
-  // Clean up and re-attach listeners
-  document.querySelectorAll('a').forEach((link) => {
-    link.removeEventListener('click', handleClick);
-    link.addEventListener('click', handleClick);
+
+  document.querySelectorAll('a[href]').forEach((link) => {
+    link.removeEventListener('click', handleClick); 
+    link.addEventListener('click', handleClick); 
   });
 
-  // Trigger reveal animation on mount
   revealTransition();
 }
