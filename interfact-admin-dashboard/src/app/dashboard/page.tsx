@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import calculateDifferenceInMinutes from "../utils/dashboard/timeCaculator";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
-
+import { runPageTransition, isPageAnimating } from '@/app/transition';
 
 
 export default function Dashboard() {
@@ -98,7 +98,10 @@ export default function Dashboard() {
     };
 
     // Navigate to intersection page by the intersection id
-    const navToIntersectionPage = (id: string) =>{
+    const navToIntersectionPage = async (id: string) =>{
+        if (isPageAnimating()) return;
+
+        await runPageTransition(true);
         router.push(`/Intersection/${id}`)
     };
 
