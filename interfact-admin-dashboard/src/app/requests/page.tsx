@@ -1,21 +1,19 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
+import { RequestComponent } from "./requestComponent";
 
 
 export default function requests() {
 
     const userFeedback = useUserFeedback();
-    const params = useParams();
     const [requests, setRequests] = useState<string[] | null>([]);
-    const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-    const getRequests = (id : string): string[] => {
+    const getRequests = (): string[] => {
         return userFeedback.flatMap(user => {
             if (Array.isArray(user.requests)) {
                 return user.requests.filter((request : string) => {
-                    return request === id
+                    return request
             });
             }
             return [];
@@ -23,40 +21,27 @@ export default function requests() {
       };
 
     useEffect(() => {
-    if (userFeedback.length > 0 && id) {
-        const fetchedRequests = getRequests(id);
+    if (userFeedback.length > 0) {
+        const fetchedRequests = getRequests();
         setRequests(fetchedRequests);
     }
-    }, [userFeedback, id]);
+    }, [userFeedback]);
 
-
+    
     return (
         <div>
             <div className="request-main">
-                <h1>Camera Requests</h1>
-                <div className="request-container">
-                    <div className="request-item shadow">
-                        <div className="item-name">JEF1 
-                        </div>
-                        <div className="item-reports">4</div>
-                        </div>
-                    <div className="request-item shadow">
-                        <div className="item-name">MON1 
-                        </div>
-                        <div className="item-reports">3</div>
-                        </div>
-                    <div className="request-item shadow">
-                        <div className="item-name">ELL1 
-                        </div>
-                        <div className="item-reports">1</div>
-                        </div>
-                </div>
+                <div><h1>Camera Requests<span className='item-reports'>{requests?.length || " - "}</span></h1></div>
             </div>
+                {requests && requests.length > 0 ? (
+                            requests.map((request : string, index) => {
+                              return (
+                                <RequestComponent request={request} index={index}></RequestComponent>
+                              );
+                            })
+                          ) : (
+                            <div>No requests found.</div>
+                          )}
         </div>
     );
-    
-    
-    
-    
-
 };
