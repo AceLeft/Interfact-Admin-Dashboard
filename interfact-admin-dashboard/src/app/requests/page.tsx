@@ -1,13 +1,12 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useParams } from 'next/navigation';
 import { useUserFeedback } from '@/app/hooks/useUserFeedback';
+import { RequestComponent } from "./requestComponent";
 
 
 export default function requests() {
 
     const userFeedback = useUserFeedback();
-    const params = useParams();
     const [requests, setRequests] = useState<string[] | null>([]);
 
     const getRequests = (): string[] => {
@@ -28,10 +27,12 @@ export default function requests() {
     }
     }, [userFeedback]);
 
+
     const test = () =>{
         console.log(requests)
     }
 
+    
     return (
         <div>
             <div className="request-main">
@@ -49,12 +50,19 @@ export default function requests() {
                         </div>
                 </div>
                 <button onClick={test}>TEST</button>
+=======
+                <div><h1>Camera Requests<span className='item-reports'>{requests?.length || " - "}</span></h1></div>
+
             </div>
+                {requests && requests.length > 0 ? (
+                            requests.map((request : string, index) => {
+                              return (
+                                <RequestComponent request={request} index={index}></RequestComponent>
+                              );
+                            })
+                          ) : (
+                            <div>No requests found.</div>
+                          )}
         </div>
     );
-    
-    
-    
-    
-
 };
