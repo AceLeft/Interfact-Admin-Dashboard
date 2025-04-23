@@ -1,4 +1,4 @@
-import { calculateHourlyScores } from "../src/app/utils/calculateHourlyScores.ts";
+import { calculateHourlyScores } from "../src/app/utils/calculateHourlyScores[LEGACY]";
 import { mockLogs } from "../__mocks__/mockData.ts";
 import { expect } from "@jest/globals";
 

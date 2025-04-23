@@ -89,7 +89,7 @@ const config: Config = {
   //   "cjs",
    "jsx",
      "ts",
-  //   "tsx",
+    "tsx",
   //   "json",
   //   "node"
   ],

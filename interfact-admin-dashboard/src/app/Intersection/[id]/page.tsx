@@ -4,26 +4,18 @@ import { useUserFeedback } from '@/app/hooks/useUserFeedback';
 import { useIntersections } from '@/app/hooks/useIntersections';
 import { useState, useEffect } from 'react';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faScrewdriverWrench, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
-import { faThumbsDown } from '@fortawesome/free-solid-svg-icons';
-import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { useLogs } from '@/app/hooks/useLogs';
-import { Log } from '@/app/types/Firebase/LogMySql';
 import { calculateTotalBlocks } from '@/app/utils/calculateTotalBlocks';
 import { calculateAverageBlockageTime } from '@/app/utils/calculateAverageBlockageTime';
-import { deleteFromDB } from '@/app/DAOs/Firebase/intersectionsDAO';
-import { confirmReport } from '@/app/utils/intersection/confirmReport';
-import { denyReport } from '@/app/utils/intersection/denyReport';
-import { getTimeColor } from '@/app/utils/intersection/getTimeColor';
-import { ReportComponent } from './reportComponent';
-import { PercentChartHour } from '@/components/PercentChartHour';
-import { PercentChartDay } from '@/components/PercentChartDay';
-import { usePercentChartDataDaily } from '@/app/hooks/usePercentChartDataDaily';
 import { usePercentChartDataHourly } from '@/app/hooks/usePercentChartDataHourly';
+import { usePercentChartDataDaily } from '@/app/hooks/usePercentChartDataDaily';
+import { IntersectionData } from './IntersectionData';
+import { ReportsWidget } from './ReportsWidget';
+import { LogsWidget } from './LogsWidget';
+import { BlockStats } from './BlockStats';
+import { PercentChart } from './PercentChart';
 
-import { Switch } from "@/components/ui/switch"
-import { UploadSnapButton } from '@/components/UploadSnapButton';
+
 
 const LOGS_PER_PAGE = 250;
 
@@ -31,229 +23,119 @@ const IntersectionPage = () => {
   const userFeedback = useUserFeedback();
   const intersections = useIntersections();
   const { logs, loading, error, refetch } = useLogs();
-
   const params = useParams();
+
   const [reports, setReports] = useState<string[] | null>([]);
-  const [hoveredHour, setHoveredHour] = useState<number | null>(null);
-  const [hoveredPeriod, setHoveredPeriod] = useState<"AM" | "PM" | null>(null);
   const [intersection, setIntersection] = useState<Intersection | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [blockedDayTime, setBlockedDayTime] = useState<number>(1);
-  const [blockedWeekTime, setBlockedWeekTime] = useState<number>(1);
-  const [avgBlockTime, setAvgBlockTime] = useState<number>(1);
+  const [blockedDayTime, setBlockedDayTime] = useState<number>(0);
+  const [blockedWeekTime, setBlockedWeekTime] = useState<number>(0);
+  const [avgBlockTime, setAvgBlockTime] = useState<number>(0);
   const [chartVersionPercent, setChartVersionPercent] = useState<boolean>(true);
 
   const percentChartDataHourly = usePercentChartDataHourly(logs, intersection?.id || '');
   const percentChartDataDaily = usePercentChartDataDaily(logs, intersection?.id || '');
 
-
-
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
+  // Load data on mount
+  useEffect(() => {
+    if (typeof refetch === "function") {
+      refetch();
+    }
+  }, [refetch]);
 
+  // Set intersection when id or intersections change
   useEffect(() => {
     if (id) {
-      const intersectionFound: Intersection | undefined = intersections.find((item) => item.id === id);
-      if (intersectionFound) {
-        setIntersection(intersectionFound);
-      }
+      const found = intersections.find(item => item.id === id);
+      if (found) setIntersection(found);
     }
   }, [id, intersections]);
 
-
-  //Load data on mount
-  useEffect(() => {
-    refetch(); 
-  }, [refetch]);
-
+  // Calculate block times and reports when logs or intersection change
   useEffect(() => {
     if (logs.length > 0 && intersection) {
-      const [blockedDayTime, blockedWeekTime] = calculateTotalBlocks(logs, intersection.id);
-      setBlockedDayTime(blockedDayTime);
-      setBlockedWeekTime(blockedWeekTime);
+      const [day, week] = calculateTotalBlocks(logs, intersection.id);
+      setBlockedDayTime(day);
+      setBlockedWeekTime(week);
+      setAvgBlockTime(calculateAverageBlockageTime(logs, intersection.id));
+
+      // Get user reports for this intersection
+      const newReports = userFeedback.flatMap(u =>
+        Array.isArray(u.reports)
+          ? u.reports.filter(r =>
+              logs.find(l => String(l.logid).trim() === String(r).trim())?.cameraid === id
+            )
+          : []
+      );
+      setReports(newReports);
+
+      // Reset page when logs or intersection change
+      setCurrentPage(1);
     }
-  }, [logs, intersection]);
+  }, [logs, intersection, userFeedback, id]);
 
-  useEffect(() => {
-    if (logs.length > 0 && intersection) {
-      const avgBlock = calculateAverageBlockageTime(logs, intersection.id);
-      setAvgBlockTime(avgBlock)
-    }
-  }, [logs, intersection]);
+  // Async retrain data call
+  const retrainData = async () => { await fetch('/api/python'); };
 
-  // Reset page when logs or intersection change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [intersection, logs]);
-
-  if (!id) {
-    return <div>No valid ID provided.</div>;
-  }
-
-  const getReports = (): string[] => {
-    return userFeedback.flatMap(user => {
-        if (Array.isArray(user.reports)) {
-            return user.reports.filter((reportLog : string) => {
-                // Only get reports for THIS intersection
-                
-                const logItem = logs.find(log => String(log.logid).trim() === String(reportLog).trim());
-                return logItem?.cameraid === id
-        });
-        }
-        return [];
-    });
-  };
-
-  const retrainData = async () => { 
-    await fetch('/api/python', { method: 'GET',});
-  };
-
-
-
-  useEffect(() => {
-    if (userFeedback.length > 0 && logs.length > 0) {
-      setReports(getReports());
-    }
-  }, [userFeedback, logs]);
-
-
+  if (!id) return <div>No valid ID provided.</div>;
 
   // Filter logs for the current intersection
-  const filteredLogs = intersection ? logs.filter(log => log.cameraid === intersection.id) : [];
+  const filteredLogs = intersection ? logs.filter(l => l.cameraid === intersection.id) : [];
   const totalPages = Math.ceil(filteredLogs.length / LOGS_PER_PAGE);
-  const currentLogs = filteredLogs.slice((currentPage - 1) * LOGS_PER_PAGE, currentPage * LOGS_PER_PAGE);
+  const currentLogs = filteredLogs.slice(
+    (currentPage - 1) * LOGS_PER_PAGE,
+    currentPage * LOGS_PER_PAGE
+  );
 
-  //Build snapshot payload
-  const snapshotChartData = {
-    hourly: percentChartDataHourly.map(({ hour, percent }) => ({
-      label: hour,
-      percent,
-    })),
-    daily: percentChartDataDaily.map(({ day, percent }) => ({
-      label: day,
-      percent,
-    })),
+  // Build snapshot payload
+  const snapshotData = {
+    hourly: percentChartDataHourly.map(({ hour, percent }) => ({ label: hour, percent })),
+    daily: percentChartDataDaily.map(({ day, percent }) => ({ label: day, percent })),
   };
+
+
   
-
-  console.log("📊 percentChartDataDaily raw:", percentChartDataDaily);
-
-
-
 
 
   return (
-    <div>
-      <div className='intersection-info'>
-        <div className='intersection-info-left shadow'>
-          <h1 className='intersection-info-name shadow'>{intersection ? intersection.name : ""} <span>({id})</span></h1>
-          <img src={intersection ? intersection.imagepath || "/no-image.webp" : "/no-image.webp" }/>
-        </div>
-        <div className='intersection-info-right shadow'>
-          <h1>Camera Details</h1>
-          <div>Id | <span>{intersection ? intersection.id : ""}</span></div>
-          <div>Imagepath | <span>{intersection ? intersection.imagepath : ""}</span></div>
-          <div>Latitude | <span>{intersection ? intersection.latitude : ""}</span></div>
-          <div>Longitude | <span>{intersection ? intersection.longitude : ""}</span></div>
-          <div>Name | <span>{intersection ? intersection.name : ""}</span></div>
-          <div>Status | <span>{intersection ? intersection.status : ""}</span></div>
-          <div>Timestamp | <span>{intersection ? intersection.timestamp : ""}</span></div>
-        </div>
-      </div>
-      <div className="intersection-info-2">
-        <div className='intersection-reports shadow'>
-          <div className='intersection-reports-label'>
-            <div><h1>Reports Received <span>{reports?.length || "-"}</span></h1></div>
-            <div><button className='' onClick={retrainData}><FontAwesomeIcon icon={faScrewdriverWrench} className="text-xl text-muted-foreground text-white" /></button></div>
-          </div>
+    <>
+      <IntersectionData intersection={intersection} id={id} />
+      <div className='intersection-info-2'>
+        <ReportsWidget reports={reports} logs={logs} retrainData={retrainData} />
+        <LogsWidget
+          intersection={intersection}
+          logs={filteredLogs}
+          loading={loading}
+          error={error}
+          currentLogs={currentLogs}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={page =>
+            setCurrentPage(Math.max(1, Math.min(page, totalPages)))
+          }
           
-
-          {reports && reports.length > 0 ? (
-            reports.map((report : string, index) => {
-              const logItem = logs.find(log => String(log.logid).trim() === String(report).trim());
-              return (
-                <ReportComponent report={report} logItem={logItem} index={index}></ReportComponent>
-              );
-            })
-          ) : (
-            <p>No reports found for this intersection.</p>
-          )}
-          
-        </div>
-        <div className='intersection-logs shadow'>
-          <h1>Camera Logs</h1>
-          <div className='pagination-controls'>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className='p-button-1'>
-              Previous
-            </button>
-            <span className='p-span'>Page {currentPage} of {totalPages} </span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className='p-button-1'>
-              Next
-            </button>
-          </div>
-          <div className='intersection-logs-list'>
-            {loading && <p>Loading logs...</p>}
-            {error && <p className="error">{error}</p>}
-            {intersection ? (
-              logs.length > 0 ? (
-                filteredLogs.length > 0 ? (
-                  <div className="log-container">
-                    {currentLogs.map((log, index) => (
-                      <div key={index} className="log-entry">
-                        <div className="log-row"><span className="log-label">Log ID:</span> {log.logid}</div>
-                        <div className="log-row"><span className="log-label">Camera ID:</span> {log.cameraid}</div>
-                        <div className="log-row"><span className="log-label">Timestamp:</span> {new Date(log.timestamp).toLocaleString()}</div>
-                        <div className="log-row"><span className="log-label">Filename:</span> {log.filename}</div>
-                        <div className="log-row"><span className="log-label">Status:</span> {log.status}</div>
-                        <div className="log-row"><span className="log-label">Path:</span> {log.path}</div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No logs available for this intersection.</p>
-                )
-              ) : (
-                <p>No logs available.</p>
-              )
-            ) : (
-              <p>Loading intersection data...</p>
-            )}
-          </div>
-        </div>
+          />
       </div>
       <div className='intersection-info-3'>
-        <div className='log-overall-time shadow'>
-        <div className='total-block-time'><h1>Average Time Blocked:</h1> <h2>{avgBlockTime} minutes</h2></div>
-            <div className='total-block-time'><h1>Total Time Blocked (Last 24 hours):</h1> <h2>{blockedDayTime} minutes</h2></div>
-            <div className='total-block-time'><h1>Total Time Blocked (Last Week):</h1> <h2>{blockedWeekTime} minutes</h2></div>
-        </div>
-        <div className='log-time-prediction shadow' style={{ position: 'relative' }}>
-          <div className='log-time-prediction-header'>
-            <div>{chartVersionPercent == true ? <h1>Hourly Blocked Percentage</h1> : <h1>Daily Blocked Percentage</h1>}</div>
-            <div><Switch checked={chartVersionPercent} onCheckedChange={setChartVersionPercent}/></div>
-            <div>
-              <button
-                onClick={refetch}
-                className='peer inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 bg-primary'>
-                <FontAwesomeIcon icon={faArrowsRotate} className="text-xl text-muted-foreground" />
-              </button>
-            </div>
-            <div>
-            <UploadSnapButton data={snapshotChartData} />
-            
+        <BlockStats
+          avgBlockTime={avgBlockTime}
+          blockedDayTime={blockedDayTime}
+          blockedWeekTime={blockedWeekTime}
 
-            </div>
-          </div>
-          {chartVersionPercent == true ? <PercentChartHour logs={logs} intersectionId={intersection ? intersection.id: ''}/> : <PercentChartDay logs={logs} intersectionId={intersection ? intersection.id: ''}/>}
-        </div>
+        />
+        <PercentChart
+          logs={logs}
+          intersectionId={intersection?.id || ''}
+          chartVersionPercent={chartVersionPercent}
+          onToggleVersion={setChartVersionPercent}
+          onRefresh={refetch}
+          snapshotChartData={snapshotData}
+
+        />
       </div>
-    </div>
+    </>
   );
 };
 

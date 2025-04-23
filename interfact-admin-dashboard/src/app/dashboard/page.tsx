@@ -42,8 +42,10 @@ export default function Dashboard() {
 
     const { refetch } = useLogs();
     useEffect(() => {
-        refetch(); // call it once on mount
-    }, [refetch]);
+        if (typeof refetch === "function") {
+          refetch();
+        }
+      }, [refetch]);
 
 
     //---------------------------- User Report & Intersection Elements -------------------------------
