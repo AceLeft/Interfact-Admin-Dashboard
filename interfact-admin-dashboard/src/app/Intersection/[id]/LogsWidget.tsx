@@ -1,7 +1,7 @@
 import React from 'react';
 import { Intersection } from '@/app/types/Firebase/intersectionTypeFB';
 
-type LogsSectionProps = {
+type LogsWidgetProps = {
   intersection: Intersection | null;
   logs: any[];
   loading: boolean;
@@ -12,7 +12,7 @@ type LogsSectionProps = {
   onPageChange: (page: number) => void;
 };
 
-export const LogsSection: React.FC<LogsSectionProps> = ({ intersection, logs, loading, error, currentLogs, currentPage, totalPages, onPageChange }) => (
+export const LogsWidget: React.FC<LogsWidgetProps> = ({ intersection, logs, loading, error, currentLogs, currentPage, totalPages, onPageChange }) => (
   <div className='intersection-logs shadow'>
     <h1>Camera Logs</h1>
     <div className='pagination-controls'>

@@ -15,6 +15,8 @@ import { LogsWidget } from './LogsWidget';
 import { BlockStats } from './BlockStats';
 import { PercentChart } from './PercentChart';
 
+
+
 const LOGS_PER_PAGE = 250;
 
 const IntersectionPage = () => {
@@ -92,6 +94,10 @@ const IntersectionPage = () => {
     hourly: percentChartDataHourly.map(({ hour, percent }) => ({ label: hour, percent })),
     daily: percentChartDataDaily.map(({ day, percent }) => ({ label: day, percent })),
   };
+
+
+  
+
 
   return (
     <>
