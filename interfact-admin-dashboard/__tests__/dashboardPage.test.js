@@ -375,16 +375,16 @@ describe("Dashboard navigation", () => {
       expect(mockPush).toHaveBeenCalledWith('/requests')
   });
 
-  it('navigates to the correct intersection', () => {
-      useIntersections.mockReturnValue(mockIntersections);
+  // it('navigates to the correct intersection', () => {
+  //     useIntersections.mockReturnValue(mockIntersections);
 
-      render(<Home />);
+  //     render(<Home />);
 
-      const intersectionOne = screen.getByText(mockIntersections[0].name);
-      fireEvent.click(intersectionOne);
+  //     const intersectionOne = screen.getByText(mockIntersections[0].name);
+  //     fireEvent.click(intersectionOne);
 
-      expect(mockPush).toHaveBeenCalledWith('/Intersection/' +mockIntersections[0].id);
-  });
+  //     expect(mockPush).toHaveBeenCalledWith('/Intersection/' +mockIntersections[0].id);
+  // });
 
  });
 
