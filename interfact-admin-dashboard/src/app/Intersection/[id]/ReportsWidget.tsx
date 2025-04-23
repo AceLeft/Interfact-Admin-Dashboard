@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons';
-import { ReportComponent } from './reportComponent';
+import { ReportComponent } from './ReportComponent';
 
 type ReportsWidgetProps = {
   reports: string[] | null;
