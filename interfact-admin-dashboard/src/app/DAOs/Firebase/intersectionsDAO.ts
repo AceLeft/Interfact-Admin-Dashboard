@@ -19,6 +19,7 @@ export const getIntersectionsFB = (callback: (data: Intersection[]) => void) => 
                 longitude: docData.longitude,
                 status: docData.status,
                 timestamp: docData.timestamp,
+                city: docData.city,
             } as Intersection;
         });
         //Then callback to the hook with data

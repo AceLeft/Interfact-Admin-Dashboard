@@ -6,4 +6,5 @@ export interface Intersection {
     longitude: number;
     status: string;
     timestamp: string;
+    city: string;
 }

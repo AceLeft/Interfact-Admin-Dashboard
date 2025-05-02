@@ -23,6 +23,7 @@ export const IntersectionData: React.FC<IntersectionDataProps> = ({ intersection
       <div>Name | <span>{intersection?.name}</span></div>
       <div>Status | <span>{intersection?.status}</span></div>
       <div>Timestamp | <span>{intersection?.timestamp}</span></div>
+      <div>City | <span>{intersection?.city}</span></div>
     </div>
   </div>
 );
