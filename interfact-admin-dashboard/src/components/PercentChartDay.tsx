@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { usePercentChartDataDaily } from "@/app/hooks/usePercentChartDataDaily";
 import { Log } from "@/app/types/Firebase/LogMySql";
@@ -11,9 +12,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+export interface DailyChartDataPoint {
+  day: string;    
+  percent: number;
+}
+
 type Props = {
   logs: Log[];
   intersectionId: string;
+  onBarClick?: (day: string) => void;  
 };
 
 const chartConfig = {
@@ -23,12 +30,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function PercentChartDay({ logs, intersectionId }: Props) {
-  const chartData = usePercentChartDataDaily(logs, intersectionId);
+export function PercentChartDay({ logs, intersectionId, onBarClick }: Props) {
+  const data: DailyChartDataPoint[] = usePercentChartDataDaily(logs, intersectionId);
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-      <BarChart width={800} height={300} data={chartData}>
+      <BarChart width={800} height={300} data={data}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="day"
@@ -42,7 +49,14 @@ export function PercentChartDay({ logs, intersectionId }: Props) {
           tickFormatter={(value) => `${value}%`}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar dataKey="percent" fill="#1D2022" radius={4} />
+        <Bar
+          dataKey="percent"
+          fill="#1D2022"
+          radius={4}
+          onClick={(e: any) => {
+            onBarClick?.(e.payload.day as string);
+          }}
+        />
       </BarChart>
     </ChartContainer>
   );
